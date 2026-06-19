@@ -14,7 +14,7 @@ export default function Footer() {
     {
       title: t('footer_game'),
       links: [
-        { label: t('footer_playNow'), href: '#hero' },
+        { label: t('footer_playNow'), href: 'https://play.google.com/store/apps/details?id=com.dreamfarm.farmlife' },
         { label: t('nav_features'), href: '#features' },
         { label: t('roadmap_title'), href: '#roadmap' },
       ],

@@ -74,7 +74,9 @@ export default function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <a
-            href="#features"
+            href="https://play.google.com/store/apps/details?id=com.dreamfarm.farmlife"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-8 py-4 bg-farm-green text-white font-display font-bold text-lg rounded-full hover:bg-farm-green-dark transition-all hover:scale-105 shadow-lg shadow-farm-green/25"
           >
             {t('hero_cta_play')}

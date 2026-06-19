@@ -55,7 +55,9 @@ export default function Navbar() {
               {langLabels[lang]}
             </button>
             <a
-              href="#hero"
+              href="https://play.google.com/store/apps/details?id=com.dreamfarm.farmlife"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-block px-5 py-2.5 bg-farm-green text-white font-display font-semibold rounded-full hover:bg-farm-green-dark transition-colors text-sm"
             >
               {t('nav_playNow')}
@@ -101,7 +103,9 @@ export default function Navbar() {
                 {langLabels[lang]}
               </button>
               <a
-                href="#hero"
+                href="https://play.google.com/store/apps/details?id=com.dreamfarm.farmlife"
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={() => setOpen(false)}
                 className="block text-center px-5 py-2.5 bg-farm-green text-white font-display font-semibold rounded-full hover:bg-farm-green-dark transition-colors text-sm mt-2"
               >
