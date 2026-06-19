@@ -42,8 +42,8 @@ export default function NFTShowcase() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           badge="NFT Collection"
-          title="Koleksi Aset Unik"
-          subtitle="Tanah, hewan, dan bangunan langka sebagai NFT di Solana. Trade atau koleksi."
+          title="Unique Collectibles"
+          subtitle="Rare land, animals, and buildings as NFTs on Solana. Trade or collect."
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

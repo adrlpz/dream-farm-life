@@ -3,15 +3,15 @@ import { Coins, Sprout, ShoppingBag, Trophy, Lock, Flame } from 'lucide-react'
 import SectionTitle from '../components/SectionTitle'
 
 const earnMethods = [
-  { icon: Sprout, label: 'Panen & Jual', desc: 'Setiap harvest menghasilkan $DREAM' },
-  { icon: Trophy, label: 'Achievements', desc: 'Capai milestone, dapat reward' },
-  { icon: Flame, label: 'Daily Login', desc: 'Login harian, reward makin besar' },
+  { icon: Sprout, label: 'Harvest & Sell', desc: 'Every harvest earns $DREAM tokens' },
+  { icon: Trophy, label: 'Achievements', desc: 'Hit milestones and earn rewards' },
+  { icon: Flame, label: 'Daily Login', desc: 'Log in daily for increasing rewards' },
 ]
 
 const spendMethods = [
-  { icon: Lock, label: 'Unlock Tanah', desc: 'Buka lahan baru untuk farm lebih besar' },
-  { icon: ShoppingBag, label: 'Beli Item', desc: 'Benih, hewan, dan bangunan baru' },
-  { icon: Coins, label: 'Trade NFTs', desc: 'Jual/beli NFT di marketplace' },
+  { icon: Lock, label: 'Unlock Land', desc: 'Expand your farm with new plots' },
+  { icon: ShoppingBag, label: 'Buy Items', desc: 'Seeds, animals, and new buildings' },
+  { icon: Coins, label: 'Trade NFTs', desc: 'Buy and sell NFTs on the marketplace' },
 ]
 
 export default function Token() {
@@ -25,7 +25,7 @@ export default function Token() {
         <SectionTitle
           badge="$DREAM Token"
           title="In-Game Economy on Solana"
-          subtitle="$DREAM adalah SPL token yang menggerakkan seluruh ekosistem Dream Farm Life."
+          subtitle="$DREAM is the SPL token powering the entire Dream Farm Life ecosystem."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-8">

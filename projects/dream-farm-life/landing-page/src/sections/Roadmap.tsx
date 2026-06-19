@@ -35,8 +35,8 @@ export default function Roadmap() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           badge="Roadmap"
-          title="Perjalanan Kami"
-          subtitle="Dari MVP hingga ekosistem lengkap — satu langkah dalam satu waktu."
+          title="Our Journey"
+          subtitle="From MVP to a full ecosystem — one step at a time."
         />
 
         <div className="relative">

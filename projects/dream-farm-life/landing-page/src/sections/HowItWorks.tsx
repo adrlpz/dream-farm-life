@@ -6,15 +6,15 @@ const steps = [
   {
     number: '01',
     icon: Wallet,
-    title: 'Hubungkan Wallet',
-    description: 'Gunakan Phantom, Solflare, atau Backpack. Atau main sebagai guest tanpa wallet.',
+    title: 'Connect Wallet',
+    description: 'Use Phantom, Solflare, or Backpack. Or play as a guest — no wallet needed.',
     color: 'bg-purple-500',
   },
   {
     number: '02',
     icon: Gamepad2,
-    title: 'Mulai Bertani',
-    description: 'Tanam benih, panen hasil, ternak hewan, dan bangun pertanian impianmu.',
+    title: 'Start Farming',
+    description: 'Plant seeds, harvest crops, raise animals, and build your dream farm.',
     color: 'bg-farm-green',
   },
   {
@@ -32,8 +32,8 @@ export default function HowItWorks() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           badge="How It Works"
-          title="Mulai dalam 3 Langkah"
-          subtitle="Dari wallet ke pertanian impian — cepat dan mudah."
+          title="Get Started in 3 Steps"
+          subtitle="From wallet to your dream farm — quick and easy."
         />
 
         <div className="relative">

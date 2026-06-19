@@ -5,43 +5,43 @@ import SectionTitle from '../components/SectionTitle'
 const features = [
   {
     icon: Sprout,
-    title: 'Tanam Beragam Tanaman',
-    description: 'Gandum, jagung, tomat, wortel, kentang, dan labu. Setiap tanaman punya waktu tumbuh dan hasil berbeda.',
+    title: 'Grow Various Crops',
+    description: 'Wheat, corn, tomatoes, carrots, potatoes, and pumpkins. Each crop has unique growth times and yields.',
     emoji: '🌱',
     color: 'bg-green-50 text-green-600',
   },
   {
     icon: Beef,
-    title: 'Ternak Hewan',
-    description: 'Pelihara sapi, ayam, dan domba. Beri makan, ambil produknya, dan jual untuk koin.',
+    title: 'Raise Animals',
+    description: 'Raise cows, chickens, and sheep. Feed them, collect their products, and sell for coins.',
     emoji: '🐄',
     color: 'bg-amber-50 text-amber-600',
   },
   {
     icon: Building2,
-    title: 'Bangun & Upgrade',
-    description: 'Bangun lumbung, silo, dan kandang. Upgrade untuk kapasitas lebih besar dan tampilan baru.',
+    title: 'Build & Upgrade',
+    description: 'Build barns, silos, and coops. Upgrade for more capacity and fresh new looks.',
     emoji: '🏡',
     color: 'bg-orange-50 text-orange-600',
   },
   {
     icon: Coins,
     title: 'Earn $DREAM Token',
-    description: 'Setiap panen dan penjualan menghasilkan $DREAM — token SPL di blockchain Solana.',
+    description: 'Every harvest and sale earns $DREAM — an SPL token on the Solana blockchain.',
     emoji: '💰',
     color: 'bg-yellow-50 text-yellow-600',
   },
   {
     icon: Image,
-    title: 'Koleksi NFT',
-    description: 'Tanah, hewan, dan bangunan langka sebagai NFT. Trade di marketplace atau koleksi.',
+    title: 'Collect NFTs',
+    description: 'Rare land, animals, and buildings as NFTs. Trade them on the marketplace or collect.',
     emoji: '🖼️',
     color: 'bg-purple-50 text-purple-600',
   },
   {
     icon: Wifi,
-    title: 'Main Offline',
-    description: 'Bermain kapan saja, di mana saja. Progress tersimpan dan settle on-chain saat online.',
+    title: 'Play Offline',
+    description: 'Play anytime, anywhere. Progress saves locally and settles on-chain when you go online.',
     emoji: '📶',
     color: 'bg-blue-50 text-blue-600',
   },
@@ -62,8 +62,8 @@ export default function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           badge="Features"
-          title="Semua yang Kamu Butuhkan"
-          subtitle="Fitur lengkap untuk membangun pertanian impianmu, dari menanam hingga menghasilkan."
+          title="Everything You Need"
+          subtitle="Full feature set to build your dream farm — from planting to earning."
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

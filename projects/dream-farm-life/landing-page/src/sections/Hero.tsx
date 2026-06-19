@@ -49,8 +49,8 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.1 }}
           className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-farm-soil leading-tight mb-6"
         >
-          Bangun Pertanian{' '}
-          <span className="text-gradient-green">Impianmu</span>
+          Build Your{' '}
+          <span className="text-gradient-green">Dream Farm</span>
         </motion.h1>
 
         {/* Subheadline */}
@@ -60,8 +60,8 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="text-lg sm:text-xl text-farm-brown max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Tanam tanaman, beternak hewan, dan bangun pertanian impianmu.
-          Santai, menyenangkan, dan dapatkan reward di blockchain Solana.
+          Grow crops, raise animals, and build your dream farm.
+          Relaxing, fun, and rewarding — powered by Solana blockchain.
         </motion.p>
 
         {/* CTAs */}
@@ -75,14 +75,14 @@ export default function Hero() {
             href="#features"
             className="inline-flex items-center gap-2 px-8 py-4 bg-farm-green text-white font-display font-bold text-lg rounded-full hover:bg-farm-green-dark transition-all hover:scale-105 shadow-lg shadow-farm-green/25"
           >
-            Mulai Bermain
+            Start Playing
             <ArrowRight className="w-5 h-5" />
           </a>
           <a
             href="#how-it-works"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-farm-soil font-display font-semibold text-lg rounded-full hover:bg-farm-cream transition-all border border-farm-brown/15"
           >
-            Pelajari Lagi
+            Learn More
           </a>
         </motion.div>
 

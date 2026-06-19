@@ -35,8 +35,8 @@ export default function Community() {
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           badge="Community"
-          title="Bergabung dengan Komunitas"
-          subtitle="Ribuan farmer sudah menunggumu. Gabung sekarang!"
+          title="Join the Community"
+          subtitle="Thousands of farmers are waiting for you. Join now!"
         />
 
         {/* Social cards */}
@@ -75,10 +75,10 @@ export default function Community() {
           className="max-w-xl mx-auto text-center"
         >
           <h3 className="font-display font-bold text-xl text-farm-soil mb-3">
-            Dapatkan Update Terbaru
+            Get the Latest Updates
           </h3>
           <p className="text-sm text-farm-brown mb-6">
-            Subscribe untuk info launch, event, dan reward eksklusif.
+            Subscribe for launch news, events, and exclusive rewards.
           </p>
           <form
             onSubmit={(e) => e.preventDefault()}
