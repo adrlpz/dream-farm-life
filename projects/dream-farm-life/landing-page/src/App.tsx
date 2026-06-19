@@ -1,5 +1,6 @@
 import Navbar from './components/Navbar'
 import Hero from './sections/Hero'
+import GamePreview from './sections/GamePreview'
 import Features from './sections/Features'
 import HowItWorks from './sections/HowItWorks'
 import Token from './sections/Token'
@@ -13,6 +14,7 @@ export default function App() {
     <div className="min-h-screen">
       <Navbar />
       <Hero />
+      <GamePreview />
       <Features />
       <HowItWorks />
       <Token />
