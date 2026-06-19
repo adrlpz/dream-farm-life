@@ -40,7 +40,7 @@ export const translations = {
     features_build_title: 'Build & Upgrade',
     features_build_desc: 'Build barns, silos, and coops. Upgrade for more capacity and fresh new looks.',
     features_token_title: 'Earn $DREAM Token',
-    features_token_desc: 'Every harvest and sale earns $DREAM — a BEP-20 token on the BSC blockchain.'
+    features_token_desc: 'Every harvest and sale earns $DREAM — a BEP-20 token on the BSC blockchain.',
     features_nft_title: 'Collect NFTs',
     features_nft_desc: 'Rare land, animals, and buildings as NFTs. Trade them on the marketplace or collect.',
     features_offline_title: 'Play Offline',
@@ -150,7 +150,7 @@ export const translations = {
     features_build_title: 'Xây dựng & Nâng cấp',
     features_build_desc: 'Xây kho, silo, và chuồng trại. Nâng cấp để tăng dung lượng và diện mạo mới.',
     features_token_title: 'Kiếm token $DREAM',
-    features_token_desc: 'Mỗi vụ thu hoạch và bán hàng đều kiếm được $DREAM — token BEP-20 trên blockchain BSC.'
+    features_token_desc: 'Mỗi vụ thu hoạch và bán hàng đều kiếm được $DREAM — token BEP-20 trên blockchain BSC.',
     features_nft_title: 'Sưu tầm NFT',
     features_nft_desc: 'Đất, vật nuôi, và công trình hiếm dưới dạng NFT. Giao dịch trên marketplace hoặc sưu tầm.',
     features_offline_title: 'Chơi offline',
