@@ -8,7 +8,7 @@ Dream Farm Life adalah web-based farming simulation game yang relaxing dan casua
 
 **Target:** Casual gamers, idle game lovers, farming sim fans. Mobile-first web.
 
-**Blockchain:** Solana — in-game economy on-chain, NFT assets, token rewards.
+**Blockchain:** BSC (BNB Chain) — in-game economy on-chain, NFT assets, token rewards.
 
 ---
 
@@ -65,16 +65,16 @@ Plant → Wait (growth timer) → Harvest → Sell → Earn Coins → Unlock/Exp
 
 ---
 
-## Solana Integration (Phase 2 — On-Chain)
+## BSC Integration (Phase 2 — On-Chain)
 
 ### 🔗 Wallet Connection
-- Solana wallet adapter (Phantom, Solflare, Backpack)
+- BSC wallet: MetaMask, Rabby, Trust Wallet (via Wagmi + WalletConnect)
 - Guest mode: play without wallet (local save only)
 - Connect wallet → bind farm to wallet address
-- Sign-in with Solana (SIWS) for auth
+- Sign-In with Ethereum (SIWE) for auth (BSC-compatible)
 
-### 🪙 $DREAM Token (SPL Token)
-- In-game currency backed by SPL token on Solana
+### 🪙 $DREAM Token (BEP-20)
+- In-game currency backed by BEP-20 token on BSC
 - Earn $DREAM: harvest, sell, complete achievements, daily login
 - Spend $DREAM: unlock land, buy seeds/animals, upgrade buildings
 - Off-chain ledger for fast gameplay → batch settle on-chain
@@ -86,7 +86,7 @@ Plant → Wait (growth timer) → Harvest → Sell → Earn Coins → Unlock/Exp
 - **Building NFTs**: special/limited edition buildings
 - **Crop NFTs**: rare crop variants (cosmetic)
 - Minting: earned through gameplay milestones
-- Standard: Metaplex Core (compressed NFTs for low cost)
+- Standard: ERC-721 / ERC-1155 (low gas on BSC)
 
 ### 🏪 Marketplace (On-Chain)
 - Trade NFTs with other players (P2P)
@@ -100,14 +100,14 @@ Plant → Wait (growth timer) → Harvest → Sell → Earn Coins → Unlock/Exp
 - Leaderboard → seasonal $DREAM pool
 - Staking: lock $DREAM → earn rare seeds/cosmetics
 
-### ⚙️ Technical Architecture (Solana)
+### ⚙️ Technical Architecture (BSC)
 
 ```
 ┌─────────────────────────────────────────────┐
 │                 Frontend (React)             │
 │  ┌──────────┐  ┌───────────┐  ┌───────────┐ │
 │  │ Game UI  │  │ Wallet    │  │ NFT       │ │
-│  │ (Canvas) │  │ Adapter   │  │ Gallery   │ │
+│  │ (Canvas) │  │ (Wagmi)   │  │ Gallery   │ │
 │  └────┬─────┘  └─────┬─────┘  └─────┬─────┘ │
 │       │              │              │        │
 │  ┌────┴──────────────┴──────────────┴─────┐  │
@@ -117,33 +117,33 @@ Plant → Wait (growth timer) → Harvest → Sell → Earn Coins → Unlock/Exp
 └───────────────────┼─────────────────────────┘
                     │
          ┌──────────┴──────────┐
-         │  Solana RPC (Helius) │
+         │  BSC RPC (BscScan)   │
          │  ┌────────────────┐ │
-         │  │ Anchor Program │ │
-         │  │ (game logic)   │ │
+         │  │ Solidity       │ │
+         │  │ Contract       │ │
          │  └────────────────┘ │
          │  ┌────────────────┐ │
-         │  │ SPL Token      │ │
+         │  │ BEP-20 Token   │ │
          │  │ ($DREAM)       │ │
          │  └────────────────┘ │
          │  ┌────────────────┐ │
-         │  │ Metaplex Core  │ │
+         │  │ ERC-721/1155   │ │
          │  │ (NFTs)         │ │
          │  └────────────────┘ │
          └─────────────────────┘
 ```
 
-**Anchor Program (On-Chain):**
-- `initialize_farm` — create farm PDA per wallet
-- `plant_crop` / `harvest_crop` — record crop state
-- `mint_reward` — mint $DREAM token
-- `mint_nft` — mint farm/animal/building NFT
-- `list_nft` / `buy_nft` — marketplace ops
-- `settle_batch` — batch settle off-chain actions
+**Solidity Contract (On-Chain):**
+- `initializeFarm` — create farm per wallet
+- `plantCrop` / `harvestCrop` — record crop state
+- `mintReward` — mint $DREAM token
+- `mintNft` — mint farm/animal/building NFT
+- `listNft` / `buyNft` — marketplace ops
+- `settleBatch` — batch settle off-chain actions
 
 **Off-Chain (Fast Gameplay):**
 - All game actions processed client-side first
-- Batch settle to Solana every N actions or on logout
+- Batch settle to BSC every N actions or on logout
 - Reduces tx fees, smooth UX
 
 ---
@@ -156,7 +156,7 @@ Plant → Wait (growth timer) → Harvest → Sell → Earn Coins → Unlock/Exp
 - Quest board (daily/weekly tasks) → $DREAM rewards
 - Farm decoration / cosmetics (NFT-based)
 - Sound & music toggle
-- Mobile wallet (Solana Mobile Stack)
+- Mobile wallet (WalletConnect v2)
 
 ---
 
@@ -167,16 +167,16 @@ Plant → Wait (growth timer) → Harvest → Sell → Earn Coins → Unlock/Exp
 | Frontend | React + Vite + TailwindCSS |
 | Game Engine | HTML5 Canvas (custom lightweight) OR PixiJS |
 | State | Zustand (game state) + localStorage (save) |
-| Blockchain | Solana (mainnet) |
-| Smart Contract | Anchor Framework (Rust) |
-| Wallet | @solana/wallet-adapter (Phantom, Solflare, Backpack) |
-| Token | SPL Token ($DREAM) |
-| NFT | Metaplex Core (compressed NFTs) |
-| RPC | Helius / QuickNode |
+| Blockchain | BSC (BNB Chain, chainId 56) |
+| Smart Contract | Solidity 0.8.x (Foundry / Hardhat) |
+| Wallet | Wagmi + WalletConnect (MetaMask, Rabby, Trust) |
+| Token | BEP-20 ($DREAM) |
+| NFT | ERC-721 / ERC-1155 (OpenSea compatible) |
+| RPC | BscScan / QuickNode / Ankr |
 | Hosting | Vercel / Cloudflare Pages |
-| Indexing | Helius Webhooks / Custom indexer |
+| Indexing | BscScan API / Custom indexer |
 
-**MVP Decision:** Phase 1 tanpa backend, fully client-side. Solana integration di Phase 2.
+**MVP Decision:** Phase 1 tanpa backend, fully client-side. BSC integration di Phase 2.
 
 ---
 
@@ -198,27 +198,27 @@ GameState {
 }
 ```
 
-### On-Chain (Solana PDAs)
+### On-Chain (BSC Contract State)
 ```
-Farm PDA {
-  owner: Pubkey
-  level: u16
-  total_harvest: u64
-  land_plots: u8
-  created_at: i64
+Farm {
+  owner: address
+  level: uint16
+  totalHarvest: uint256
+  landPlots: uint8
+  createdAt: uint256
 }
 
-Crop PDA {
-  farm: Pubkey
-  crop_type: u8
-  planted_at: i64
-  stage: u8
+Crop {
+  farm: address
+  cropType: uint8
+  plantedAt: uint256
+  stage: uint8
 }
 
 $DREAM Token {
-  mint: SPL Token
-  treasury: PDA (mint authority)
-  player_ata: Associated Token Account
+  mint: BEP-20 contract
+  treasury: address (minter role)
+  playerBalance: mapping(address => uint256)
 }
 ```
 

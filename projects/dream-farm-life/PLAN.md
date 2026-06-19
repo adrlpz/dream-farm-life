@@ -7,7 +7,7 @@
 - [ ] Setup folder structure (components, hooks, store, assets, utils)
 - [ ] Install deps: zustand, react-router-dom
 - [ ] Setup local save/load utility (localStorage wrapper)
-- [ ] Setup Solana deps (pre-install for Phase 2): @solana/web3.js, @solana/wallet-adapter
+- [ ] Setup BSC deps (pre-install for Phase 2): wagmi, viem, @wagmi/core
 
 ### 1.2 Core Game State
 - [ ] Define GameState TypeScript interfaces
@@ -69,37 +69,37 @@
 
 ---
 
-## Phase 4: Solana Integration (Week 7-10) ⛓️
+## Phase 4: BSC Integration (Week 7-10) ⛓️
 
 ### 4.1 Wallet Connection
-- [ ] Install & configure @solana/wallet-adapter
-- [ ] Wallet modal: Phantom, Solflare, Backpack
+- [ ] Install & configure Wagmi + WalletConnect v2
+- [ ] Wallet modal: MetaMask, Rabby, Trust Wallet
 - [ ] Guest mode → connect wallet → bind farm to address
-- [ ] SIWS (Sign-In With Solana) auth flow
-- [ ] Display wallet address + SOL balance in HUD
+- [ ] SIWE (Sign-In with Ethereum) auth flow (BSC-compatible)
+- [ ] Display wallet address + BNB balance in HUD
 
-### 4.2 Anchor Program (Smart Contract)
-- [ ] Init Anchor project (Rust)
-- [ ] `initialize_farm` — create farm PDA per wallet
-- [ ] `plant_crop` / `harvest_crop` — record crop state on-chain
-- [ ] `upgrade_building` — building level in PDA
-- [ ] `expand_land` — land plot count in PDA
-- [ ] Unit tests (Anchor test framework)
-- [ ] Deploy to Solana devnet → testnet → mainnet
+### 4.2 Solidity Contract (Smart Contract)
+- [ ] Init Foundry project (Solidity)
+- [ ] `initializeFarm` — create farm per wallet
+- [ ] `plantCrop` / `harvestCrop` — record crop state on-chain
+- [ ] `upgradeBuilding` — building level in contract
+- [ ] `expandLand` — land plot count in contract
+- [ ] Unit tests (Foundry / Hardhat)
+- [ ] Deploy to BSC testnet → mainnet
 
-### 4.3 $DREAM Token (SPL)
-- [ ] Create SPL token mint (decimals: 6)
-- [ ] Treasury PDA as mint authority
-- [ ] `mint_reward` instruction — mint $DREAM to player ATA
+### 4.3 $DREAM Token (BEP-20)
+- [ ] Deploy BEP-20 token contract (decimals: 18)
+- [ ] Treasury address as minter role
+- [ ] `mintReward` function — mint $DREAM to player wallet
 - [ ] Earn triggers: harvest, sell, achievements, daily login
 - [ ] Spend flow: unlock land, buy seeds (burn or transfer to treasury)
-- [ ] Token metadata (Metaplex standard)
+- [ ] Token metadata (BscScan verified)
 
-### 4.4 NFT System (Metaplex Core)
-- [ ] Setup Metaplex Core (compressed NFTs)
-- [ ] Farm Land NFTs — mint on land purchase
-- [ ] Animal NFTs — mint rare/bred animals
-- [ ] Building NFTs — mint special edition buildings
+### 4.4 NFT System (ERC-721/1155)
+- [ ] Deploy ERC-721 (unique land) + ERC-1155 (batch items) contracts
+- [ ] Farm Land NFTs — mint on land purchase (ERC-721)
+- [ ] Animal NFTs — mint rare/bred animals (ERC-1155)
+- [ ] Building NFTs — mint special edition buildings (ERC-1155)
 - [ ] NFT metadata: image, attributes, rarity
 - [ ] NFT gallery UI in game
 
@@ -140,9 +140,9 @@
 - [ ] Optimize assets (compress sprites)
 - [ ] Lighthouse audit (target: 90+ perf)
 - [ ] Deploy frontend to Vercel / Cloudflare Pages
-- [ ] Anchor program verified on mainnet
+- [ ] Contracts verified on BscScan
 - [ ] Custom domain setup
-- [ ] $DREAM token listed (Jupiter, Birdeye)
+- [ ] $DREAM token listed (PancakeSwap, BscScan)
 
 ---
 
@@ -171,10 +171,10 @@
 | localStorage size limit (~5MB) | Compress state, limit history |
 | Scope creep | Strict MVP scope, Phase 2 backlog |
 | Asset bottleneck | Use placeholder sprites first, swap later |
-| Solana tx cost | Compressed NFTs (Metaplex Core), batch settle |
+| BSC gas cost | Low on BSC (~$0.03/tx), batch settle |
 | Wallet UX friction | Guest mode first, wallet optional |
-| RPC rate limits | Helius/QuickNode paid tier, fallback RPC |
-| Smart contract bugs | Anchor test suite, audit before mainnet |
+| RPC rate limits | BscScan/Ankr/QuickNode paid tier, fallback RPC |
+| Smart contract bugs | Foundry test suite, audit before mainnet |
 
 ---
 
@@ -185,11 +185,11 @@
 - **Zustand** — lightweight, built-in persist middleware
 - **Mobile-first** — responsive grid, touch-friendly
 - **No energy/gating** — relaxing = no artificial limits
-- **Solana mainnet** — blockchain for token + NFTs
-- **Anchor Framework** — Solana smart contract standard
-- **Metaplex Core** — compressed NFTs (low mint cost)
+- **BSC mainnet** — blockchain for token + NFTs (low gas, EVM-compatible)
+- **Solidity + Foundry** — smart contract standard
+- **ERC-721/1155** — NFT standards (OpenSea compatible)
 - **Off-chain first** — batch settle to chain (smooth UX)
-- **$DREAM SPL token** — in-game currency on-chain
+- **$DREAM BEP-20 token** — in-game currency on-chain
 
 ---
 
@@ -223,32 +223,30 @@ dream-farm-life/
 │   │   ├── crops.ts
 │   │   ├── animals.ts
 │   │   └── buildings.ts
-│   ├── solana/
-│   │   ├── connection.ts
-│   │   ├── program.ts
-│   │   ├── token.ts
-│   │   ├── nft.ts
-│   │   └── marketplace.ts
+│   ├── contracts/
+│   │   ├── Farm.sol
+│   │   ├── DreamToken.sol
+│   │   ├── DreamNFT.sol
+│   │   └── Marketplace.sol
 │   ├── utils/
 │   │   ├── saveLoad.ts
 │   │   ├── offlineProgress.ts
 │   │   └── batchSettle.ts
 │   ├── App.tsx
 │   └── main.tsx
-├── programs/                     # Anchor program (Rust)
-│   └── dream-farm/
-│       ├── src/
-│       │   ├── lib.rs
-│       │   ├── state.rs
-│       │   ├── instructions/
-│       │   └── errors.rs
-│       └── Cargo.toml
+├── contracts/                    # Solidity contracts (Foundry)
+│   ├── src/
+│   │   ├── Farm.sol
+│   │   ├── DreamToken.sol
+│   │   ├── DreamNFT.sol
+│   │   └── Marketplace.sol
+│   ├── test/
+│   │   └── Farm.t.sol
+│   └── foundry.toml
 ├── index.html
 ├── package.json
 ├── vite.config.ts
-├── tailwind.config.js
-├── Anchor.toml
-└── Cargo.toml
+└── tailwind.config.js
 ```
 
 ---
@@ -260,7 +258,7 @@ dream-farm-life/
 | 1 | 1-2 | Project setup, core state, grid UI |
 | 2 | 3-4 | Crops, animals, economy |
 | 3 | 5-6 | Buildings, expansion, progression |
-| 4 | 7-10 | **Solana: wallet, Anchor, $DREAM, NFTs, marketplace** |
+| 4 | 7-10 | **BSC: wallet, Solidity, $DREAM, NFTs, marketplace** |
 | 5 | 11-12 | Polish, deploy, launch |
 
 ---

@@ -10,10 +10,10 @@ export const translations = {
     nav_playNow: 'Play Now',
 
     // Hero
-    hero_badge: 'Farming Game on Solana',
+    hero_badge: 'Farming Game on BSC',
     hero_title_1: 'Build Your',
     hero_title_2: 'Dream Farm',
-    hero_subtitle: 'Grow crops, raise animals, and build your dream farm. Relaxing, fun, and rewarding — powered by Solana blockchain.',
+    hero_subtitle: 'Grow crops, raise animals, and build your dream farm. Relaxing, fun, and rewarding — powered by BSC (BNB Chain).',
     hero_cta_play: 'Start Playing',
     hero_cta_learn: 'Learn More',
     hero_stat_crops: 'Crops',
@@ -40,7 +40,7 @@ export const translations = {
     features_build_title: 'Build & Upgrade',
     features_build_desc: 'Build barns, silos, and coops. Upgrade for more capacity and fresh new looks.',
     features_token_title: 'Earn $DREAM Token',
-    features_token_desc: 'Every harvest and sale earns $DREAM — an SPL token on the Solana blockchain.',
+    features_token_desc: 'Every harvest and sale earns $DREAM — a BEP-20 token on the BSC blockchain.'
     features_nft_title: 'Collect NFTs',
     features_nft_desc: 'Rare land, animals, and buildings as NFTs. Trade them on the marketplace or collect.',
     features_offline_title: 'Play Offline',
@@ -51,7 +51,7 @@ export const translations = {
     hiw_title: 'Get Started in 3 Steps',
     hiw_subtitle: 'From wallet to your dream farm — quick and easy.',
     hiw_step1_title: 'Connect Wallet',
-    hiw_step1_desc: 'Use Phantom, Solflare, or Backpack. Or play as a guest — no wallet needed.',
+    hiw_step1_desc: 'Use MetaMask, Rabby, or Trust Wallet. Or play as a guest — no wallet needed.',
     hiw_step2_title: 'Start Farming',
     hiw_step2_desc: 'Plant seeds, harvest crops, raise animals, and build your dream farm.',
     hiw_step3_title: 'Earn & Trade',
@@ -59,8 +59,8 @@ export const translations = {
 
     // Token
     token_badge: '$DREAM Token',
-    token_title: 'In-Game Economy on Solana',
-    token_subtitle: '$DREAM is the SPL token powering the entire Dream Farm Life ecosystem.',
+    token_title: 'In-Game Economy on BSC',
+    token_subtitle: '$DREAM is the BEP-20 token powering the entire Dream Farm Life ecosystem.',
     token_earn_title: 'Earn $DREAM',
     token_earn1_label: 'Harvest & Sell',
     token_earn1_desc: 'Every harvest earns $DREAM tokens',
@@ -79,7 +79,7 @@ export const translations = {
     // NFT Showcase
     nft_badge: 'NFT Collection',
     nft_title: 'Unique Collectibles',
-    nft_subtitle: 'Rare land, animals, and buildings as NFTs on Solana. Trade or collect.',
+    nft_subtitle: 'Rare land, animals, and buildings as NFTs on BSC. Trade or collect.',
     nft_coming: 'More NFTs coming soon — stay tuned!',
 
     // Roadmap
@@ -97,7 +97,7 @@ export const translations = {
     community_email_placeholder: 'email@example.com',
 
     // Footer
-    footer_brand: 'Build your dream farm on Solana. Relax, farm, earn.',
+    footer_brand: 'Build your dream farm on BSC. Relax, farm, earn.',
     footer_game: 'Game',
     footer_learn: 'Learn',
     footer_legal: 'Legal',
@@ -107,7 +107,7 @@ export const translations = {
     footer_terms: 'Terms of Service',
     footer_privacy: 'Privacy Policy',
     footer_rights: '© 2026 Dream Farm Life. All rights reserved.',
-    footer_built: 'Built on ⚡ Solana',
+    footer_built: 'Built on ⚡ BSC'
   },
   vi: {
     // Navbar
@@ -120,10 +120,10 @@ export const translations = {
     nav_playNow: 'Chơi ngay',
 
     // Hero
-    hero_badge: 'Trò chơi nông trại trên Solana',
+    hero_badge: 'Trò chơi nông trại trên BSC',
     hero_title_1: 'Xây dựng',
     hero_title_2: 'Nông trại mơ ước',
-    hero_subtitle: 'Trồng cây, chăn nuôi, và xây dựng nông trại mơ ước của bạn. Thư giãn, vui vẻ, và đầy phần thưởng — trên blockchain Solana.',
+    hero_subtitle: 'Trồng cây, chăn nuôi, và xây dựng nông trại mơ ước của bạn. Thư giãn, vui vẻ, và đầy phần thưởng — trên blockchain BSC (BNB Chain).',
     hero_cta_play: 'Bắt đầu chơi',
     hero_cta_learn: 'Tìm hiểu thêm',
     hero_stat_crops: 'Cây trồng',
@@ -150,7 +150,7 @@ export const translations = {
     features_build_title: 'Xây dựng & Nâng cấp',
     features_build_desc: 'Xây kho, silo, và chuồng trại. Nâng cấp để tăng dung lượng và diện mạo mới.',
     features_token_title: 'Kiếm token $DREAM',
-    features_token_desc: 'Mỗi vụ thu hoạch và bán hàng đều kiếm được $DREAM — token SPL trên blockchain Solana.',
+    features_token_desc: 'Mỗi vụ thu hoạch và bán hàng đều kiếm được $DREAM — token BEP-20 trên blockchain BSC.'
     features_nft_title: 'Sưu tầm NFT',
     features_nft_desc: 'Đất, vật nuôi, và công trình hiếm dưới dạng NFT. Giao dịch trên marketplace hoặc sưu tầm.',
     features_offline_title: 'Chơi offline',
@@ -161,7 +161,7 @@ export const translations = {
     hiw_title: 'Bắt đầu trong 3 bước',
     hiw_subtitle: 'Từ ví đến nông trại mơ ước — nhanh chóng và dễ dàng.',
     hiw_step1_title: 'Kết nối ví',
-    hiw_step1_desc: 'Dùng Phantom, Solflare, hoặc Backpack. Hoặc chơi như khách — không cần ví.',
+    hiw_step1_desc: 'Dùng MetaMask, Rabby, hoặc Trust Wallet. Hoặc chơi như khách — không cần ví.',
     hiw_step2_title: 'Bắt đầu canh tác',
     hiw_step2_desc: 'Gieo hạt, thu hoạch, chăn nuôi, và xây dựng nông trại mơ ước.',
     hiw_step3_title: 'Kiếm & Giao dịch',
@@ -169,8 +169,8 @@ export const translations = {
 
     // Token
     token_badge: 'Token $DREAM',
-    token_title: 'Kinh tế trong game trên Solana',
-    token_subtitle: '$DREAM là token SPL cung cấp năng lượng cho toàn bộ hệ sinh thái Dream Farm Life.',
+    token_title: 'Kinh tế trong game trên BSC',
+    token_subtitle: '$DREAM là token BEP-20 cung cấp năng lượng cho toàn bộ hệ sinh thái Dream Farm Life.',
     token_earn_title: 'Kiếm $DREAM',
     token_earn1_label: 'Thu hoạch & Bán',
     token_earn1_desc: 'Mỗi vụ thu hoạch đều kiếm được token $DREAM',
@@ -189,7 +189,7 @@ export const translations = {
     // NFT Showcase
     nft_badge: 'Bộ sưu tập NFT',
     nft_title: 'Sưu tầm độc đáo',
-    nft_subtitle: 'Đất, vật nuôi, và công trình hiếm dưới dạng NFT trên Solana. Giao dịch hoặc sưu tầm.',
+    nft_subtitle: 'Đất, vật nuôi, và công trình hiếm dưới dạng NFT trên BSC. Giao dịch hoặc sưu tầm.',
     nft_coming: 'Nhiều NFT hơn sắp ra mắt — hãy đón chờ!',
 
     // Roadmap
@@ -207,7 +207,7 @@ export const translations = {
     community_email_placeholder: 'email@example.com',
 
     // Footer
-    footer_brand: 'Xây dựng nông trại mơ ước trên Solana. Thư giãn, canh tác, kiếm tiền.',
+    footer_brand: 'Xây dựng nông trại mơ ước trên BSC. Thư giãn, canh tác, kiếm tiền.',
     footer_game: 'Trò chơi',
     footer_learn: 'Tìm hiểu',
     footer_legal: 'Pháp lý',
@@ -217,7 +217,7 @@ export const translations = {
     footer_terms: 'Điều khoản dịch vụ',
     footer_privacy: 'Chính sách bảo mật',
     footer_rights: '© 2026 Dream Farm Life. Mọi quyền được bảo lưu.',
-    footer_built: 'Xây dựng trên ⚡ Solana',
+    footer_built: 'Xây dựng trên ⚡ BSC'
   },
 } as const
 
