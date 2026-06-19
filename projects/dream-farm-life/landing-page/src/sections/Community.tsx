@@ -6,8 +6,8 @@ const socials = [
   {
     icon: Twitter,
     name: 'Twitter / X',
-    handle: '@DreamFarmLife',
-    href: '#',
+    handle: '@DFarmLife',
+    href: 'https://x.com/DFarmLife',
     color: 'bg-black text-white',
   },
   {
@@ -20,8 +20,8 @@ const socials = [
   {
     icon: Send,
     name: 'Telegram',
-    handle: 'Chat Group',
-    href: '#',
+    handle: '@Dreamfarmlife',
+    href: 'https://t.me/Dreamfarmlife',
     color: 'bg-blue-400 text-white',
   },
 ]

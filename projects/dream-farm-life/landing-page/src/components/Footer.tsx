@@ -27,8 +27,8 @@ const footerLinks = [
 ]
 
 const socialLinks = [
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: MessageCircle, href: '#', label: 'Discord' },
+  { icon: Twitter, href: 'https://x.com/DFarmLife', label: 'Twitter' },
+  { icon: MessageCircle, href: 'https://t.me/Dreamfarmlife', label: 'Discord' },
   { icon: Github, href: 'https://github.com/adrlpz/dream-farm-life', label: 'GitHub' },
 ]
 
