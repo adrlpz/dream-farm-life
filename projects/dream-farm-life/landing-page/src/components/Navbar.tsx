@@ -1,18 +1,23 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Sprout } from 'lucide-react'
+import { Menu, X, Sprout, Globe } from 'lucide-react'
+import { useI18n } from '../i18n'
+import type { Lang } from '../i18n/translations'
 
-const navLinks = [
-  { label: 'Features', href: '#features' },
-  { label: 'How It Works', href: '#how-it-works' },
-  { label: '$DREAM', href: '#token' },
-  { label: 'NFTs', href: '#nfts' },
-  { label: 'Roadmap', href: '#roadmap' },
-  { label: 'Community', href: '#community' },
-]
+const langLabels: Record<Lang, string> = { en: 'EN', vi: 'VI' }
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const { lang, setLang, t } = useI18n()
+
+  const navLinks = [
+    { label: t('nav_features'), href: '#features' },
+    { label: t('nav_howItWorks'), href: '#how-it-works' },
+    { label: t('nav_token'), href: '#token' },
+    { label: t('nav_nfts'), href: '#nfts' },
+    { label: t('nav_roadmap'), href: '#roadmap' },
+    { label: t('nav_community'), href: '#community' },
+  ]
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-farm-cream/80 backdrop-blur-md border-b border-farm-brown/10">
@@ -39,13 +44,21 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* CTA */}
-          <div className="hidden md:block">
+          {/* Right side: lang switcher + CTA */}
+          <div className="hidden md:flex items-center gap-3">
+            <button
+              onClick={() => setLang(lang === 'en' ? 'vi' : 'en')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium text-farm-brown-dark hover:bg-farm-brown/5 transition-colors border border-farm-brown/15"
+              aria-label="Switch language"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              {langLabels[lang]}
+            </button>
             <a
               href="#hero"
               className="inline-block px-5 py-2.5 bg-farm-green text-white font-display font-semibold rounded-full hover:bg-farm-green-dark transition-colors text-sm"
             >
-              Play Now
+              {t('nav_playNow')}
             </a>
           </div>
 
@@ -80,12 +93,19 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+              <button
+                onClick={() => { setLang(lang === 'en' ? 'vi' : 'en'); setOpen(false) }}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-farm-brown-dark border border-farm-brown/15 rounded-full"
+              >
+                <Globe className="w-3.5 h-3.5" />
+                {langLabels[lang]}
+              </button>
               <a
                 href="#hero"
                 onClick={() => setOpen(false)}
                 className="block text-center px-5 py-2.5 bg-farm-green text-white font-display font-semibold rounded-full hover:bg-farm-green-dark transition-colors text-sm mt-2"
               >
-                Play Now
+                {t('nav_playNow')}
               </a>
             </div>
           </motion.div>

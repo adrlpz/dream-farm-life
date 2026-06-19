@@ -1,35 +1,38 @@
 import { motion } from 'framer-motion'
 import SectionTitle from '../components/SectionTitle'
+import { useI18n } from '../i18n'
 
 const videos = [
   {
     src: '/assets/videos/farming-preview.mp4',
     poster: '/assets/videos/poster-farming.jpg',
-    label: 'Farm & Build',
-    description: 'Grow crops, raise animals, and expand your farm.',
+    labelKey: 'preview_farm_label' as const,
+    descKey: 'preview_farm_desc' as const,
   },
   {
     src: '/assets/videos/orders-preview.mp4',
     poster: '/assets/videos/poster-orders.jpg',
-    label: 'Fulfill Orders',
-    description: 'Complete orders to earn coins, stars, and XP.',
+    labelKey: 'preview_orders_label' as const,
+    descKey: 'preview_orders_desc' as const,
   },
 ]
 
 export default function GamePreview() {
+  const { t } = useI18n()
+
   return (
     <section className="py-24 bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          badge="Game Preview"
-          title="A Peek Inside the Farm"
-          subtitle="See what awaits you — crops to grow, orders to fill, and a farm to call your own."
+          badge={t('preview_badge')}
+          title={t('preview_title')}
+          subtitle={t('preview_subtitle')}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {videos.map((video, i) => (
             <motion.div
-              key={video.label}
+              key={video.labelKey}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -47,10 +50,10 @@ export default function GamePreview() {
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-5">
                 <span className="font-display font-bold text-white text-lg block">
-                  {video.label}
+                  {t(video.labelKey)}
                 </span>
                 <span className="text-white/70 text-sm">
-                  {video.description}
+                  {t(video.descKey)}
                 </span>
               </div>
             </motion.div>

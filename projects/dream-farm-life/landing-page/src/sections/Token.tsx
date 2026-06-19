@@ -1,31 +1,33 @@
 import { motion } from 'framer-motion'
 import { Coins, Sprout, ShoppingBag, Trophy, Lock, Flame } from 'lucide-react'
 import SectionTitle from '../components/SectionTitle'
+import { useI18n } from '../i18n'
 
-const earnMethods = [
-  { icon: Sprout, label: 'Harvest & Sell', desc: 'Every harvest earns $DREAM tokens' },
-  { icon: Trophy, label: 'Achievements', desc: 'Hit milestones and earn rewards' },
-  { icon: Flame, label: 'Daily Login', desc: 'Log in daily for increasing rewards' },
+const earnMeta = [
+  { icon: Sprout, labelKey: 'token_earn1_label' as const, descKey: 'token_earn1_desc' as const },
+  { icon: Trophy, labelKey: 'token_earn2_label' as const, descKey: 'token_earn2_desc' as const },
+  { icon: Flame, labelKey: 'token_earn3_label' as const, descKey: 'token_earn3_desc' as const },
 ]
 
-const spendMethods = [
-  { icon: Lock, label: 'Unlock Land', desc: 'Expand your farm with new plots' },
-  { icon: ShoppingBag, label: 'Buy Items', desc: 'Seeds, animals, and new buildings' },
-  { icon: Coins, label: 'Trade NFTs', desc: 'Buy and sell NFTs on the marketplace' },
+const spendMeta = [
+  { icon: Lock, labelKey: 'token_spend1_label' as const, descKey: 'token_spend1_desc' as const },
+  { icon: ShoppingBag, labelKey: 'token_spend2_label' as const, descKey: 'token_spend2_desc' as const },
+  { icon: Coins, labelKey: 'token_spend3_label' as const, descKey: 'token_spend3_desc' as const },
 ]
 
 export default function Token() {
+  const { t } = useI18n()
+
   return (
     <section id="token" className="py-24 bg-white relative overflow-hidden">
-      {/* Background accent */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-farm-gold/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-farm-green/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
-          badge="$DREAM Token"
-          title="In-Game Economy on Solana"
-          subtitle="$DREAM is the SPL token powering the entire Dream Farm Life ecosystem."
+          badge={t('token_badge')}
+          title={t('token_title')}
+          subtitle={t('token_subtitle')}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-8">
@@ -41,21 +43,18 @@ export default function Token() {
                 <Coins className="w-5 h-5 text-farm-green" />
               </div>
               <h3 className="font-display font-bold text-2xl text-farm-soil">
-                Earn $DREAM
+                {t('token_earn_title')}
               </h3>
             </div>
             <div className="space-y-4">
-              {earnMethods.map(({ icon: Icon, label, desc }) => (
-                <div
-                  key={label}
-                  className="flex items-start gap-4 p-4 bg-farm-cream rounded-xl border border-farm-brown/5"
-                >
+              {earnMeta.map(({ icon: Icon, labelKey, descKey }) => (
+                <div key={labelKey} className="flex items-start gap-4 p-4 bg-farm-cream rounded-xl border border-farm-brown/5">
                   <div className="w-10 h-10 rounded-lg bg-farm-green/10 flex items-center justify-center shrink-0">
                     <Icon className="w-5 h-5 text-farm-green" />
                   </div>
                   <div>
-                    <div className="font-display font-semibold text-farm-soil">{label}</div>
-                    <div className="text-sm text-farm-brown">{desc}</div>
+                    <div className="font-display font-semibold text-farm-soil">{t(labelKey)}</div>
+                    <div className="text-sm text-farm-brown">{t(descKey)}</div>
                   </div>
                 </div>
               ))}
@@ -74,21 +73,18 @@ export default function Token() {
                 <ShoppingBag className="w-5 h-5 text-farm-gold" />
               </div>
               <h3 className="font-display font-bold text-2xl text-farm-soil">
-                Spend $DREAM
+                {t('token_spend_title')}
               </h3>
             </div>
             <div className="space-y-4">
-              {spendMethods.map(({ icon: Icon, label, desc }) => (
-                <div
-                  key={label}
-                  className="flex items-start gap-4 p-4 bg-farm-cream rounded-xl border border-farm-brown/5"
-                >
+              {spendMeta.map(({ icon: Icon, labelKey, descKey }) => (
+                <div key={labelKey} className="flex items-start gap-4 p-4 bg-farm-cream rounded-xl border border-farm-brown/5">
                   <div className="w-10 h-10 rounded-lg bg-farm-gold/10 flex items-center justify-center shrink-0">
                     <Icon className="w-5 h-5 text-farm-gold" />
                   </div>
                   <div>
-                    <div className="font-display font-semibold text-farm-soil">{label}</div>
-                    <div className="text-sm text-farm-brown">{desc}</div>
+                    <div className="font-display font-semibold text-farm-soil">{t(labelKey)}</div>
+                    <div className="text-sm text-farm-brown">{t(descKey)}</div>
                   </div>
                 </div>
               ))}

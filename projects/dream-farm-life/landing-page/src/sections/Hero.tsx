@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, Sprout, Egg, Wheat } from 'lucide-react'
+import { useI18n } from '../i18n'
 
 export default function Hero() {
+  const { t } = useI18n()
+
   return (
     <section
       id="hero"
@@ -38,7 +41,7 @@ export default function Hero() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-farm-green/10 border border-farm-green/20 rounded-full text-sm font-medium text-farm-green mb-8">
             <Sprout className="w-4 h-4" />
-            Farming Game on Solana
+            {t('hero_badge')}
           </span>
         </motion.div>
 
@@ -49,8 +52,8 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.1 }}
           className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold text-farm-soil leading-tight mb-6"
         >
-          Build Your{' '}
-          <span className="text-gradient-green">Dream Farm</span>
+          {t('hero_title_1')}{' '}
+          <span className="text-gradient-green">{t('hero_title_2')}</span>
         </motion.h1>
 
         {/* Subheadline */}
@@ -60,8 +63,7 @@ export default function Hero() {
           transition={{ duration: 0.7, delay: 0.2 }}
           className="text-lg sm:text-xl text-farm-brown max-w-2xl mx-auto mb-10 leading-relaxed"
         >
-          Grow crops, raise animals, and build your dream farm.
-          Relaxing, fun, and rewarding — powered by Solana blockchain.
+          {t('hero_subtitle')}
         </motion.p>
 
         {/* CTAs */}
@@ -75,14 +77,14 @@ export default function Hero() {
             href="#features"
             className="inline-flex items-center gap-2 px-8 py-4 bg-farm-green text-white font-display font-bold text-lg rounded-full hover:bg-farm-green-dark transition-all hover:scale-105 shadow-lg shadow-farm-green/25"
           >
-            Start Playing
+            {t('hero_cta_play')}
             <ArrowRight className="w-5 h-5" />
           </a>
           <a
             href="#how-it-works"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-farm-soil font-display font-semibold text-lg rounded-full hover:bg-farm-cream transition-all border border-farm-brown/15"
           >
-            Learn More
+            {t('hero_cta_learn')}
           </a>
         </motion.div>
 
@@ -94,9 +96,9 @@ export default function Hero() {
           className="mt-16 flex flex-wrap items-center justify-center gap-8 sm:gap-14"
         >
           {[
-            { icon: Wheat, label: 'Crops', value: '6+' },
-            { icon: Egg, label: 'Animals', value: '3+' },
-            { icon: Sprout, label: 'NFTs', value: '15+' },
+            { icon: Wheat, label: t('hero_stat_crops'), value: '6+' },
+            { icon: Egg, label: t('hero_stat_animals'), value: '3+' },
+            { icon: Sprout, label: t('hero_stat_nfts'), value: '15+' },
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-farm-green/10 flex items-center justify-center">

@@ -1,30 +1,5 @@
 import { Sprout, Github, Twitter, MessageCircle } from 'lucide-react'
-
-const footerLinks = [
-  {
-    title: 'Game',
-    links: [
-      { label: 'Play Now', href: '#hero' },
-      { label: 'Features', href: '#features' },
-      { label: 'Roadmap', href: '#roadmap' },
-    ],
-  },
-  {
-    title: 'Learn',
-    links: [
-      { label: 'Whitepaper', href: '#' },
-      { label: 'Documentation', href: '#' },
-      { label: '$DREAM Token', href: '#token' },
-    ],
-  },
-  {
-    title: 'Legal',
-    links: [
-      { label: 'Terms of Service', href: '#' },
-      { label: 'Privacy Policy', href: '#' },
-    ],
-  },
-]
+import { useI18n } from '../i18n'
 
 const socialLinks = [
   { icon: Twitter, href: 'https://x.com/DFarmLife', label: 'Twitter' },
@@ -33,6 +8,34 @@ const socialLinks = [
 ]
 
 export default function Footer() {
+  const { t } = useI18n()
+
+  const footerLinks = [
+    {
+      title: t('footer_game'),
+      links: [
+        { label: t('footer_playNow'), href: '#hero' },
+        { label: t('nav_features'), href: '#features' },
+        { label: t('roadmap_title'), href: '#roadmap' },
+      ],
+    },
+    {
+      title: t('footer_learn'),
+      links: [
+        { label: t('footer_whitepaper'), href: '#' },
+        { label: t('footer_documentation'), href: '#' },
+        { label: '$DREAM Token', href: '#token' },
+      ],
+    },
+    {
+      title: t('footer_legal'),
+      links: [
+        { label: t('footer_terms'), href: '#' },
+        { label: t('footer_privacy'), href: '#' },
+      ],
+    },
+  ]
+
   return (
     <footer className="bg-farm-soil text-white/80">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -46,7 +49,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-sm text-white/60 mb-6">
-              Build your dream farm on Solana. Relax, farm, earn.
+              {t('footer_brand')}
             </p>
             <div className="flex gap-3">
               {socialLinks.map(({ icon: Icon, href, label }) => (
@@ -89,10 +92,10 @@ export default function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/40">
-            © 2026 Dream Farm Life. All rights reserved.
+            {t('footer_rights')}
           </p>
           <p className="text-sm text-white/40">
-            Built on ⚡ Solana
+            {t('footer_built')}
           </p>
         </div>
       </div>

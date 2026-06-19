@@ -1,3 +1,4 @@
+import { I18nProvider } from './i18n'
 import Navbar from './components/Navbar'
 import Hero from './sections/Hero'
 import GamePreview from './sections/GamePreview'
@@ -11,17 +12,19 @@ import Footer from './components/Footer'
 
 export default function App() {
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <Hero />
-      <GamePreview />
-      <Features />
-      <HowItWorks />
-      <Token />
-      <NFTShowcase />
-      <Roadmap />
-      <Community />
-      <Footer />
-    </div>
+    <I18nProvider>
+      <div className="min-h-screen">
+        <Navbar />
+        <Hero />
+        <GamePreview />
+        <Features />
+        <HowItWorks />
+        <Token />
+        <NFTShowcase />
+        <Roadmap />
+        <Community />
+        <Footer />
+      </div>
+    </I18nProvider>
   )
 }
