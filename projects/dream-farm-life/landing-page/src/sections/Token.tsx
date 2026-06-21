@@ -107,15 +107,15 @@ export default function Token() {
             </div>
             <div>
               <div className="text-sm opacity-80 mb-1">Network</div>
-              <div className="font-display font-bold text-2xl">BSC</div>
+              <div className="font-display font-bold text-2xl">Solana</div>
             </div>
             <div>
               <div className="text-sm opacity-80 mb-1">Standard</div>
-              <div className="font-display font-bold text-2xl">BEP-20</div>
+              <div className="font-display font-bold text-2xl">SPL</div>
             </div>
             <div>
               <div className="text-sm opacity-80 mb-1">NFT</div>
-              <div className="font-display font-bold text-2xl">ERC-721</div>
+              <div className="font-display font-bold text-2xl">Metaplex</div>
             </div>
           </div>
         </motion.div>

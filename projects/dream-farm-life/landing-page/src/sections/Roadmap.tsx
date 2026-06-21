@@ -5,7 +5,7 @@ import { useI18n } from '../i18n'
 
 const roadmap = [
   { quarter: 'Q3 2026', title: 'MVP Launch', items: ['Core farming gameplay', 'Crop & animal system', 'Local save system', 'Beta launch'], active: true },
-  { quarter: 'Q4 2026', title: 'BSC Integration', items: ['Wallet connection', '$DREAM token launch', 'NFT minting', 'Batch settlement'], active: false },
+  { quarter: 'Q4 2026', title: 'Solana Integration', items: ['Wallet connection (Phantom, Solflare)', '$DREAM SPL token launch', 'NFT minting (Metaplex)', 'Batch settlement'], active: false },
   { quarter: 'Q1 2027', title: 'Marketplace & Social', items: ['NFT marketplace', 'P2P trading', 'Visit friends farms', 'Leaderboard'], active: false },
   { quarter: 'Q2 2027', title: 'Expansion', items: ['Mobile app', 'Seasons & weather', 'Crafting system', 'New crops & animals'], active: false },
 ]
