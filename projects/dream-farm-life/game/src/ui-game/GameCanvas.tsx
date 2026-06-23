@@ -11,6 +11,7 @@ import { CraftingUI } from './CraftingUI'
 import { SkillPanel } from './SkillPanel'
 import { WalletUI } from './WalletUI'
 import { MarketplaceUI } from './MarketplaceUI'
+import { Tutorial } from './Tutorial'
 import type { SkillId } from '../data/skills'
 import type { SkillState } from '../systems/SkillSystem'
 
@@ -29,6 +30,9 @@ export function GameCanvas() {
   const [showSkills, setShowSkills] = useState(false)
   const [showWallet, setShowWallet] = useState(false)
   const [showMarket, setShowMarket] = useState(false)
+  const [showTutorial, setShowTutorial] = useState(() => {
+    return !localStorage.getItem('dreamfarm_tutorial_done')
+  })
   const [notifications, setNotifications] = useState<string[]>([])
 
   const handleStateChange = useCallback((s: EngineState) => {
@@ -141,6 +145,15 @@ export function GameCanvas() {
           onBuy={(id) => engine.token.buyItem(id)}
           onSell={(id) => {}}
           onClose={() => setShowMarket(false)}
+        />
+      )}
+
+      {showTutorial && (
+        <Tutorial
+          onComplete={() => {
+            localStorage.setItem('dreamfarm_tutorial_done', '1')
+            setShowTutorial(false)
+          }}
         />
       )}
 
