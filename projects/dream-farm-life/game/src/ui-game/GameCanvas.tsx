@@ -8,6 +8,9 @@ import { NotificationStack } from './NotificationStack'
 import { DialogUI } from './DialogUI'
 import { QuestLog } from './QuestLog'
 import { CraftingUI } from './CraftingUI'
+import { SkillPanel } from './SkillPanel'
+import type { SkillId } from '../data/skills'
+import type { SkillState } from '../systems/SkillSystem'
 
 const BIOME_NAMES: Record<BiomeType, string> = {
   farmland: '🌾 Farmland', forest: '🌲 Forest', beach: '🏖️ Beach', mountain: '⛰️ Mountain',
@@ -21,6 +24,7 @@ export function GameCanvas() {
   const [showInventory, setShowInventory] = useState(false)
   const [showQuestLog, setShowQuestLog] = useState(false)
   const [showCrafting, setShowCrafting] = useState(false)
+  const [showSkills, setShowSkills] = useState(false)
   const [notifications, setNotifications] = useState<string[]>([])
 
   const handleStateChange = useCallback((s: EngineState) => {
@@ -44,7 +48,8 @@ export function GameCanvas() {
       if (e.key === 'i' || e.key === 'I' || e.key === 'Tab') { e.preventDefault(); setShowInventory(p => !p) }
       if (e.key === 'q' || e.key === 'Q') setShowQuestLog(p => !p)
       if (e.key === 'c' || e.key === 'C') setShowCrafting(p => !p)
-      if (e.key === 'Escape') { setShowInventory(false); setShowQuestLog(false); setShowCrafting(false); engine.closeDialog() }
+      if (e.key === 'k' || e.key === 'K') setShowSkills(p => !p)
+      if (e.key === 'Escape') { setShowInventory(false); setShowQuestLog(false); setShowCrafting(false); setShowSkills(false); engine.closeDialog() }
     }
     window.addEventListener('keydown', onKey)
     return () => { engine.stop(); engine.save(); window.removeEventListener('resize', resize); window.removeEventListener('keydown', onKey) }
@@ -107,8 +112,15 @@ export function GameCanvas() {
           onClose={() => setShowQuestLog(false)} onAbandon={(qid) => engine.quests.abandonQuest(qid)} />
       )}
 
+      {showSkills && state && (
+        <SkillPanel
+          skills={state.skills as Record<SkillId, SkillState>}
+          onClose={() => setShowSkills(false)}
+        />
+      )}
+
       <div className="absolute bottom-20 left-4 text-white/30 text-xs select-none pointer-events-none">
-        WASD=Move · E=Gather/Talk · 1-5=Hotbar · I=Inventory · Q=Quests · C=Craft · Esc=Close
+        WASD=Move · E=Gather/Talk · 1-5=Hotbar · I=Inventory · Q=Quests · C=Craft · K=Skills · Esc=Close
       </div>
     </div>
   )

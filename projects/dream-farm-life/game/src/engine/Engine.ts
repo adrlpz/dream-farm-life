@@ -13,6 +13,7 @@ import { QuestSystem } from '../systems/QuestSystem'
 import { CraftingSystem } from '../systems/CraftingSystem'
 import { BuildingPlacer } from '../systems/BuildingPlacer'
 import { WeatherSystem } from '../systems/WeatherSystem'
+import { SkillSystem } from '../systems/SkillSystem'
 import type { EngineConfig, EngineState, GameTime, BiomeType } from './types'
 
 export class Engine {
@@ -30,6 +31,7 @@ export class Engine {
   crafting: CraftingSystem
   buildings: BuildingPlacer
   weather: WeatherSystem
+  skills: SkillSystem
   npcs: NpcManager
   player: Player
 
@@ -70,6 +72,7 @@ export class Engine {
     this.crafting = new CraftingSystem()
     this.buildings = new BuildingPlacer()
     this.weather = new WeatherSystem()
+    this.skills = new SkillSystem()
     this.npcs = new NpcManager()
     this.npcs.initialize()
     this.renderer = new Renderer(this.ctx, this.camera, this.tileSize)
@@ -128,6 +131,19 @@ export class Engine {
                 this.quests.updateProgress('gather', item.itemId, item.count)
                 this.quests.updateProgress('gather', 'any', item.count)
               }
+            }
+            // Skill XP
+            const actionXp: Record<string, { skill: 'farming' | 'mining' | 'foraging' | 'fishing' | 'crafting' | 'animal_care'; xp: number }> = {
+              till: { skill: 'farming', xp: 5 }, plant: { skill: 'farming', xp: 8 },
+              water: { skill: 'farming', xp: 3 }, harvest: { skill: 'farming', xp: 15 },
+              gather: { skill: 'foraging', xp: 10 },
+            }
+            const xpInfo = actionXp[result.action]
+            if (xpInfo) {
+              this.skills.addXp(xpInfo.skill, xpInfo.xp * result.items.length)
+              this.player.data.farmingLevel = this.skills.getLevel('farming')
+              this.player.data.farmingXp = this.skills.getXp('farming')
+              this.player.data.farmingXpToNext = this.skills.getXpToNext('farming')
             }
           }
         }
@@ -197,6 +213,7 @@ export class Engine {
     const crafted = this.crafting.update(this.player)
     for (const c of crafted) {
       this.particles.emit(this.player.data.x, this.player.data.y, 10, '#4ade80', 1)
+      this.skills.addXp('crafting', 10)
     }
 
     // Quest auto-complete
@@ -314,6 +331,7 @@ export class Engine {
         ...this.quests.consumeNotifications(),
         ...this.crafting.consumeNotifications(),
         ...this.buildings.consumeNotifications(),
+        ...this.skills.consumeNotifications(),
       ],
       farmPlotCount: this.interaction.farmPlots.length,
       animalCount: this.interaction.farmAnimals.length,
@@ -326,6 +344,7 @@ export class Engine {
       claimSize: this.buildings.landClaim.size,
       craftingQueueCount: this.crafting.queue.length,
       weather: { type: this.weather.state.current, emoji: this.weather.emoji, name: this.weather.name },
+      skills: this.skills.serialize(),
     })
   }
 
@@ -336,6 +355,7 @@ export class Engine {
       quests: { active: this.quests.activeQuests, completed: this.quests.completedQuests },
       npcs: this.npcs.serialize(), crafting: this.crafting.serialize(),
       buildings: this.buildings.serialize(), weather: this.weather.serialize(),
+      skills: this.skills.serialize(),
     }
     try { localStorage.setItem('dreamfarm_openworld', JSON.stringify(data)) } catch {}
   }
@@ -354,6 +374,7 @@ export class Engine {
       if (data.crafting) this.crafting.deserialize(data.crafting)
       if (data.buildings) this.buildings.deserialize(data.buildings)
       if (data.weather) this.weather.deserialize(data.weather)
+      if (data.skills) this.skills.deserialize(data.skills)
       this.camera.snapToTarget()
       return true
     } catch { return false }

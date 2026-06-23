@@ -162,4 +162,5 @@ export interface EngineState {
   claimSize: number
   craftingQueueCount: number
   weather: { type: string; emoji: string; name: string }
+  skills: Record<string, { level: number; xp: number; totalXp: number }>
 }
