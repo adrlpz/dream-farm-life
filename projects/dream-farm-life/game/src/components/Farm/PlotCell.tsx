@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Plot } from '../../types'
+import { Plot, CropId } from '../../types'
+import { useGameActions } from '../../hooks/useGameActions'
 import { useGameStore } from '../../store/gameStore'
-import { CROPS } from '../../data/crops'
+import { CROPS_COMPAT as CROPS } from '../../types'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STAGE_COUNT = 4
@@ -14,9 +15,7 @@ export default function PlotCell({ plot }: Props) {
   const [showPicker, setShowPicker] = useState(false)
   const [justHarvested, setJustHarvested] = useState(false)
 
-  const plantCrop = useGameStore((s) => s.plantCrop)
-  const harvestCrop = useGameStore((s) => s.harvestCrop)
-  const unlockPlot = useGameStore((s) => s.unlockPlot)
+  const { plantCrop, harvestCrop, unlockPlot } = useGameActions()
   const level = useGameStore((s) => s.player.level)
   const coins = useGameStore((s) => s.player.coins)
 
@@ -113,7 +112,7 @@ export default function PlotCell({ plot }: Props) {
           >
             <CropPicker
               onSelect={(cropId) => {
-                plantCrop(plot.id, cropId)
+                plantCrop(plot.id, cropId as CropId)
                 setShowPicker(false)
               }}
               onClose={() => setShowPicker(false)}

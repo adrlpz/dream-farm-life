@@ -1,11 +1,12 @@
+import { useGameActions } from '../../hooks/useGameActions'
 import { useGameStore } from '../../store/gameStore'
 import PlotCell from './PlotCell'
 
 export default function FarmGrid() {
   const plots = useGameStore((s) => s.plots)
   const gridSize = useGameStore((s) => s.gridSize)
-  const expandGrid = useGameStore((s) => s.expandGrid)
   const coins = useGameStore((s) => s.player.coins)
+  const { expandGrid } = useGameActions()
 
   const expandCost = gridSize * 500
   const canExpand = gridSize < 8 && coins >= expandCost

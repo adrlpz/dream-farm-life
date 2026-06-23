@@ -1,4 +1,7 @@
 import { useGameStore } from '../../store/gameStore'
+import { useWalletStore } from '../../store/walletStore'
+import { WalletButton } from '../Wallet'
+import { dailyBonusForDay, STREAK_REWARDS } from '../../data/levels'
 import { motion } from 'framer-motion'
 
 export default function HUD() {
@@ -6,6 +9,8 @@ export default function HUD() {
   const totalHarvests = useGameStore((s) => s.totalHarvests)
   const claimDailyBonus = useGameStore((s) => s.claimDailyBonus)
   const day = useGameStore((s) => s.day)
+  const connected = useWalletStore((s) => s.connected)
+  const dreamBalance = useWalletStore((s) => s.dreamBalance)
 
   const xpPercent = player.xpToNext > 0 ? (player.xp / player.xpToNext) * 100 : 0
 
@@ -41,10 +46,18 @@ export default function HUD() {
         <button
           onClick={() => claimDailyBonus()}
           className="bg-yellow-600/80 hover:bg-yellow-500 text-white text-xs font-bold py-1.5 px-2 rounded-lg transition-all active:scale-95"
-          title={`Day ${day} — Claim ${20 * day} coins`}
+          title={`Day ${day} — Claim ${dailyBonusForDay(day)} coins`}
         >
           🎁 Day {day}
         </button>
+
+        {/* Wallet + $DREAM balance */}
+        <div className="flex flex-col items-end gap-0.5">
+          <WalletButton />
+          {connected && (
+            <span className="text-purple-300 text-[9px]">✨ {dreamBalance.toFixed(0)} $DREAM</span>
+          )}
+        </div>
       </div>
     </header>
   )

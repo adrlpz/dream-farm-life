@@ -1,6 +1,6 @@
 import { GameState, Plot, PlacedAnimal } from '../types'
-import { CROPS } from '../data/crops'
-import { ANIMALS } from '../data/animals'
+import { CROPS_COMPAT as CROPS } from '../types'
+import { ANIMALS_COMPAT as ANIMALS } from '../types'
 
 const STAGE_COUNT = 4 // seed, sprout, mature, harvestable
 

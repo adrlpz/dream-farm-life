@@ -1,11 +1,12 @@
+import { useGameActions } from '../../hooks/useGameActions'
 import { useGameStore } from '../../store/gameStore'
-import { CROPS } from '../../data/crops'
+import { CROPS_COMPAT as CROPS } from '../../types'
 import { PRODUCTS } from '../../data/products'
 import { InventoryItem } from '../../types'
 
 export default function InventoryPanel() {
   const inventory = useGameStore((s) => s.inventory)
-  const sellItem = useGameStore((s) => s.sellItem)
+  const { sellItem } = useGameActions()
 
   const items = Object.entries(inventory).filter(([_, count]) => count > 0) as [InventoryItem, number][]
 

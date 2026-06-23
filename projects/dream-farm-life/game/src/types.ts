@@ -1,11 +1,16 @@
 // ─── Crop ───
 export type CropId = 'wheat' | 'corn' | 'tomato' | 'carrot' | 'potato' | 'pumpkin' | 'strawberry' | 'grape'
 
+// Re-export from new data with backward-compat
+import { CROPS as _CROPS } from './data/crops'
+import type { CropDef as NewCropDef } from './data/crops'
+
+// Classic farm CropDef shape
 export interface CropDef {
-  id: CropId
+  id: string
   name: string
   emoji: string
-  stages: string[] // emoji per stage: [seed, sprout, mature, harvestable]
+  stages: string[]
   growTimeMs: number
   sellPrice: number
   seedCost: number
@@ -13,24 +18,42 @@ export interface CropDef {
   unlockLevel: number
 }
 
+// Convert new CROPS to old shape for classic farm compatibility
+export const CROPS_COMPAT: Record<string, CropDef> = Object.fromEntries(
+  Object.entries(_CROPS).map(([id, c]) => [id, {
+    id: c.id,
+    name: c.name,
+    emoji: c.emoji,
+    stages: c.stageEmojis,
+    growTimeMs: c.growthTimeMs,
+    sellPrice: c.sellPrice,
+    seedCost: Math.floor(c.sellPrice * 0.4),
+    xp: c.xp,
+    unlockLevel: c.unlockLevel,
+  }])
+)
+
 export interface PlantedCrop {
   cropId: CropId
-  plantedAt: number // timestamp ms
-  stage: number // 0=seed, 1=sprout, 2=mature, 3=harvestable
+  plantedAt: number
+  stage: number
   watered: boolean
 }
 
 // ─── Animal ───
 export type AnimalId = 'chicken' | 'cow' | 'sheep' | 'goat' | 'pig'
 
+import { ANIMALS as _ANIMALS } from './data/animals'
+import type { AnimalDef as NewAnimalDef } from './data/animals'
+
 export interface AnimalDef {
-  id: AnimalId
+  id: string
   name: string
   emoji: string
   happyEmoji: string
-  productId: ProductId
+  productId: string
   productEmoji: string
-  feedCropId: CropId
+  feedCropId: string
   feedAmount: number
   productionTimeMs: number
   buyPrice: number
@@ -38,11 +61,28 @@ export interface AnimalDef {
   unlockLevel: number
 }
 
+export const ANIMALS_COMPAT: Record<string, AnimalDef> = Object.fromEntries(
+  Object.entries(_ANIMALS).map(([id, a]) => [id, {
+    id: a.id,
+    name: a.name,
+    emoji: a.emoji,
+    happyEmoji: a.emoji,
+    productId: a.productId,
+    productEmoji: a.productEmoji,
+    feedCropId: a.feedItemId,
+    feedAmount: 1,
+    productionTimeMs: a.productionTimeMs,
+    buyPrice: a.buyPrice,
+    xp: 10,
+    unlockLevel: a.unlockLevel,
+  }])
+)
+
 export interface PlacedAnimal {
   animalId: AnimalId
   fedAt: number | null
   lastProductAt: number | null
-  happiness: number // 0-100
+  happiness: number
 }
 
 // ─── Products ───

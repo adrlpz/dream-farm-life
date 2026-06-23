@@ -1,12 +1,12 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { GameState, Plot, PlacedAnimal, PlacedBuilding, CropId, AnimalId, InventoryItem } from '../types'
-import { CROPS } from '../data/crops'
-import { ANIMALS } from '../data/animals'
+import { GameState, Plot, PlacedAnimal, PlacedBuilding, CropId, AnimalId, BuildingId, InventoryItem } from '../types'
+import { CROPS_COMPAT as CROPS } from '../types'
+import { ANIMALS_COMPAT as ANIMALS } from '../types'
 import { PRODUCTS } from '../data/products'
 import { BUILDINGS, getBuildingCost } from '../data/buildings'
-import { xpForLevel, DAILY_BONUS_BASE } from '../data/levels'
+import { xpForLevel, DAILY_BONUS_BASE, dailyBonusForDay, STREAK_REWARDS } from '../data/levels'
 import { calculateOfflineProgress } from '../utils/offlineProgress'
 
 const INITIAL_GRID_SIZE = 4 // 4x4 = 16 plots
@@ -173,7 +173,7 @@ export const useGameStore = create<GameStore>()(
         const animalDef = ANIMALS[animal.animalId]
         if (!animalDef) return false
 
-        const feedCount = state.inventory[animalDef.feedCropId] || 0
+        const feedCount = state.inventory[animalDef.feedCropId as InventoryItem] || 0
         if (feedCount < animalDef.feedAmount) return false
 
         set((s) => {
@@ -230,7 +230,7 @@ export const useGameStore = create<GameStore>()(
 
         set((s) => {
           s.player.coins -= cost
-          s.buildings.push({ buildingId, level: 1 })
+          s.buildings.push({ buildingId: buildingId as BuildingId, level: 1 })
         })
         return true
       },
@@ -306,7 +306,7 @@ export const useGameStore = create<GameStore>()(
 
       removeItem: (item, amount) => {
         const state = get()
-        const current = state.inventory[item] || 0
+        const current = state.inventory[item as InventoryItem] || 0
         if (current < amount) return false
 
         set((s) => {
@@ -319,7 +319,7 @@ export const useGameStore = create<GameStore>()(
 
       sellItem: (item, amount) => {
         const state = get()
-        const current = state.inventory[item] || 0
+        const current = state.inventory[item as InventoryItem] || 0
         if (current < amount) return false
 
         // Find sell price
@@ -356,10 +356,13 @@ export const useGameStore = create<GameStore>()(
 
       claimDailyBonus: () => {
         const state = get()
-        // Simple daily check: use day counter
-        const bonus = DAILY_BONUS_BASE * state.day
+        const bonus = dailyBonusForDay(state.day)
+        const streakReward = STREAK_REWARDS[state.day]
         set((s) => {
           s.player.coins += bonus
+          if (streakReward?.gems) {
+            s.player.gems += streakReward.gems
+          }
           s.day += 1
         })
         return true

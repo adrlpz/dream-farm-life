@@ -1,15 +1,14 @@
-import { ANIMALS } from '../../data/animals'
+import { ANIMALS_COMPAT as ANIMALS } from '../../types'
+import { useGameActions } from '../../hooks/useGameActions'
 import { useGameStore } from '../../store/gameStore'
-import { AnimalId } from '../../types'
+import { AnimalId, InventoryItem } from '../../types'
 
 export default function AnimalShop() {
   const level = useGameStore((s) => s.player.level)
   const coins = useGameStore((s) => s.player.coins)
   const animals = useGameStore((s) => s.animals)
-  const buyAnimal = useGameStore((s) => s.buyAnimal)
-  const feedAnimal = useGameStore((s) => s.feedAnimal)
-  const collectProduct = useGameStore((s) => s.collectProduct)
   const inventory = useGameStore((s) => s.inventory)
+  const { buyAnimal, feedAnimal, collectProduct } = useGameActions()
 
   const animalDefs = Object.values(ANIMALS)
 
@@ -30,7 +29,7 @@ export default function AnimalShop() {
               const canCollect = animal.lastProductAt
                 ? Date.now() - animal.lastProductAt >= def.productionTimeMs
                 : false
-              const feedAvailable = (inventory[def.feedCropId] || 0) >= def.feedAmount
+              const feedAvailable = (inventory[def.feedCropId as InventoryItem] || 0) >= def.feedAmount
               const progress = animal.lastProductAt
                 ? Math.min(((Date.now() - animal.lastProductAt) / def.productionTimeMs) * 100, 100)
                 : 0

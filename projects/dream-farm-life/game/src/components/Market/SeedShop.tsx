@@ -1,4 +1,4 @@
-import { CROPS } from '../../data/crops'
+import { CROPS_COMPAT as CROPS } from '../../types'
 import { useGameStore } from '../../store/gameStore'
 import { CropId } from '../../types'
 
