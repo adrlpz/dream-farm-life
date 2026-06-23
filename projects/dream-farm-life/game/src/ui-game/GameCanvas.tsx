@@ -1,4 +1,4 @@
-// GameCanvas.tsx — Main game canvas (Phase 5: +crafting, building)
+// GameCanvas.tsx — Main game canvas (Phase 6: +weather)
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Engine } from '../engine/Engine'
 import type { EngineState, BiomeType } from '../engine/types'
@@ -72,6 +72,7 @@ export function GameCanvas() {
           activeQuestCount={state.activeQuests?.length ?? 0}
           buildingCount={state.buildingCount ?? 0}
           claimSize={state.claimSize ?? 9}
+          weather={state.weather}
         />
       )}
 

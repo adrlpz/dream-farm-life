@@ -1,4 +1,4 @@
-// Engine.ts — Main game loop (Phase 5: +crafting, building placement)
+// Engine.ts — Main game loop (Phase 6: +weather, day/night, seasons)
 import { Camera } from './Camera'
 import { InputManager } from './InputManager'
 import { Renderer } from './Renderer'
@@ -12,6 +12,7 @@ import { GrowthSystem } from '../systems/GrowthSystem'
 import { QuestSystem } from '../systems/QuestSystem'
 import { CraftingSystem } from '../systems/CraftingSystem'
 import { BuildingPlacer } from '../systems/BuildingPlacer'
+import { WeatherSystem } from '../systems/WeatherSystem'
 import type { EngineConfig, EngineState, GameTime, BiomeType } from './types'
 
 export class Engine {
@@ -28,6 +29,7 @@ export class Engine {
   quests: QuestSystem
   crafting: CraftingSystem
   buildings: BuildingPlacer
+  weather: WeatherSystem
   npcs: NpcManager
   player: Player
 
@@ -42,6 +44,7 @@ export class Engine {
   private onStateChange?: (state: EngineState) => void
   private autoSaveTimer = 0
   private growthTimer = 0
+  private weatherParticleTimer = 0
 
   activeDialog: { npcId: string; lineIndex: number } | null = null
 
@@ -66,6 +69,7 @@ export class Engine {
     this.quests = new QuestSystem()
     this.crafting = new CraftingSystem()
     this.buildings = new BuildingPlacer()
+    this.weather = new WeatherSystem()
     this.npcs = new NpcManager()
     this.npcs.initialize()
     this.renderer = new Renderer(this.ctx, this.camera, this.tileSize)
@@ -110,10 +114,9 @@ export class Engine {
           const result = this.interaction.attemptInteract(this.player)
           if (result.success) {
             this.camera.addShake(1.5)
-            const facingPos = this.player.getFacingTile()
-            this.particles.emit(facingPos.x + 0.5, facingPos.y + 0.5, 8,
+            const fp = this.player.getFacingTile()
+            this.particles.emit(fp.x + 0.5, fp.y + 0.5, 8,
               { gather: '#ffd700', till: '#8b6914', water: '#3b8dbd', plant: '#4ade80', harvest: '#f0c040' }[result.action] ?? '#ffd700', 0.8)
-
             if (result.action === 'harvest') {
               for (const item of result.items) {
                 this.quests.updateProgress('harvest', item.itemId, item.count)
@@ -139,13 +142,54 @@ export class Engine {
     this.updateGameTime(dt)
     this.player.updateAnimation(dt)
 
-    // Growth
+    // Weather
+    this.weather.update(dt, this.gameTime.season)
+
+    // Weather effects on crops
+    if (this.weather.watersCrops) {
+      for (const plot of this.interaction.farmPlots) {
+        if (plot.cropId && !plot.watered) plot.watered = true
+      }
+    }
+
+    // Growth (affected by weather)
     this.growthTimer += dt
     if (this.growthTimer >= 0.5) {
       this.growthTimer = 0
       const cropResults = this.growth.updatePlots(this.interaction.farmPlots, 0.5, this.gameTime.season)
       for (const r of cropResults) {
         if (r.type === 'crop_ready') this.interaction.addNotification(`${r.emoji} Ready to harvest!`)
+      }
+
+      // Storm damage
+      if (this.weather.cropDamageChance > 0) {
+        for (const plot of this.interaction.farmPlots) {
+          if (plot.cropId && Math.random() < this.weather.cropDamageChance) {
+            // Destroy crop
+            plot.cropId = null
+            plot.state = 'tilled'
+            plot.growthProgress = 0
+            plot.stage = 0
+            plot.harvestable = false
+            this.interaction.addNotification('⛈️ Storm destroyed a crop!')
+          }
+        }
+      }
+    }
+
+    // Weather particles
+    this.weatherParticleTimer += dt
+    if (this.weatherParticleTimer >= 0.1) {
+      this.weatherParticleTimer = 0
+      const pc = this.weather.getParticlesConfig()
+      if (pc) {
+        // Emit weather particles around player
+        for (let i = 0; i < Math.min(pc.count, 5); i++) {
+          const rx = this.player.data.x + (Math.random() - 0.5) * 20
+          const ry = this.player.data.y + (Math.random() - 0.5) * 20
+          const vx = pc.type === 'stormy' ? (Math.random() - 0.3) * 2 : (Math.random() - 0.5) * 0.3
+          this.particles.emit(rx, ry, 1, pc.color, 0.1)
+        }
       }
     }
 
@@ -190,7 +234,9 @@ export class Engine {
 
   private render() {
     this.renderer.clear()
+
     const visibleChunks = this.chunks.getVisibleChunks(this.camera.offsetX, this.camera.offsetY, this.width, this.height)
+
     this.renderer.renderChunks(visibleChunks)
     this.renderer.renderFarmPlots(this.interaction.farmPlots, this.camera, this.width, this.height)
     this.renderer.renderBuildings(this.buildings.buildings, this.camera, this.width, this.height)
@@ -198,7 +244,25 @@ export class Engine {
     this.renderer.renderNpcs(this.npcs.npcs, this.camera, this.width, this.height)
     this.renderer.renderEntities(visibleChunks, this.camera)
     this.renderer.renderPlayer(this.player)
+
     this.particles.render(this.ctx, this.camera.offsetX, this.camera.offsetY, this.camera.zoom, this.width, this.height, this.tileSize)
+
+    // Day/night + weather overlay
+    const lighting = this.weather.getLightingOverlay(this.gameTime.hour)
+    if (lighting.alpha > 0) {
+      this.ctx.fillStyle = lighting.color
+      this.ctx.globalAlpha = lighting.alpha
+      this.ctx.fillRect(0, 0, this.width, this.height)
+      this.ctx.globalAlpha = 1
+    }
+
+    // Fog overlay
+    if (this.weather.state.current === 'foggy') {
+      this.ctx.fillStyle = '#c0c0c0'
+      this.ctx.globalAlpha = 0.15 * this.weather.state.intensity
+      this.ctx.fillRect(0, 0, this.width, this.height)
+      this.ctx.globalAlpha = 1
+    }
 
     if (!this.activeDialog) {
       const nearby = this.interaction.getNearbyResource(this.player)
@@ -261,6 +325,7 @@ export class Engine {
       buildingCount: this.buildings.buildings.length,
       claimSize: this.buildings.landClaim.size,
       craftingQueueCount: this.crafting.queue.length,
+      weather: { type: this.weather.state.current, emoji: this.weather.emoji, name: this.weather.name },
     })
   }
 
@@ -270,7 +335,7 @@ export class Engine {
       chunks: this.chunks.serialize(), farm: this.interaction.serializeFarm(),
       quests: { active: this.quests.activeQuests, completed: this.quests.completedQuests },
       npcs: this.npcs.serialize(), crafting: this.crafting.serialize(),
-      buildings: this.buildings.serialize(),
+      buildings: this.buildings.serialize(), weather: this.weather.serialize(),
     }
     try { localStorage.setItem('dreamfarm_openworld', JSON.stringify(data)) } catch {}
   }
@@ -288,6 +353,7 @@ export class Engine {
       if (data.npcs) this.npcs.deserialize(data.npcs)
       if (data.crafting) this.crafting.deserialize(data.crafting)
       if (data.buildings) this.buildings.deserialize(data.buildings)
+      if (data.weather) this.weather.deserialize(data.weather)
       this.camera.snapToTarget()
       return true
     } catch { return false }

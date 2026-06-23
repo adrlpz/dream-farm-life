@@ -161,4 +161,5 @@ export interface EngineState {
   buildingCount: number
   claimSize: number
   craftingQueueCount: number
+  weather: { type: string; emoji: string; name: string }
 }
