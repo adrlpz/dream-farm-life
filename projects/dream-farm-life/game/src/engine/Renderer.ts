@@ -5,6 +5,10 @@ import { TILE_DEFS } from '../data/tiles'
 import { ITEMS } from '../data/items'
 import { TOOL_DEFS } from '../data/tools'
 import type { Chunk, TileType, BiomeType, NearbyResource } from './types'
+import type { FarmPlot } from '../systems/farmTypes'
+import type { NpcState } from '../entities/NPC'
+import type { NpcDef } from '../data/npcs'
+import { CROPS } from '../data/crops'
 
 export class Renderer {
   private ctx: CanvasRenderingContext2D
@@ -93,6 +97,113 @@ export class Renderer {
         }
       }
     }
+  }
+
+  renderFarmPlots(plots: FarmPlot[], camera: Camera, canvasW: number, canvasH: number) {
+    const ctx = this.ctx
+    const ts = this.tileSize * this.camera.zoom
+    const cx = canvasW / 2
+    const cy = canvasH / 2
+
+    for (const plot of plots) {
+      const sx = (plot.x - this.camera.offsetX) * ts + cx
+      const sy = (plot.y - this.camera.offsetY) * ts + cy
+      if (sx + ts < 0 || sy + ts < 0 || sx > canvasW || sy > canvasH) continue
+
+      // Tilled soil base
+      ctx.fillStyle = plot.watered ? '#5a4a2e' : '#7a6a4e'
+      ctx.fillRect(sx + 1, sy + 1, ts - 2, ts - 2)
+
+      // Soil lines
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)'
+      ctx.lineWidth = 1
+      for (let i = 1; i < 4; i++) {
+        ctx.beginPath()
+        ctx.moveTo(sx + 2, sy + (ts * i) / 4)
+        ctx.lineTo(sx + ts - 2, sy + (ts * i) / 4)
+        ctx.stroke()
+      }
+
+      // Water shimmer
+      if (plot.watered) {
+        ctx.fillStyle = 'rgba(59,141,189,0.2)'
+        ctx.fillRect(sx + 1, sy + 1, ts - 2, ts - 2)
+      }
+
+      // Crop sprite
+      if (plot.cropId) {
+        const crop = CROPS[plot.cropId]
+        if (crop) {
+          const emoji = crop.stageEmojis[plot.stage] ?? crop.emoji
+          ctx.font = `${Math.max(14, ts * 0.7)}px serif`
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(emoji, sx + ts / 2, sy + ts * 0.4)
+
+          // Harvest glow
+          if (plot.harvestable) {
+            ctx.strokeStyle = 'rgba(74,222,128,0.6)'
+            ctx.lineWidth = 2
+            ctx.beginPath()
+            ctx.arc(sx + ts / 2, sy + ts / 2, ts * 0.45, 0, Math.PI * 2)
+            ctx.stroke()
+          }
+        }
+      }
+    }
+  }
+
+  renderNpcs(npcs: NpcState[], camera: Camera, canvasW: number, canvasH: number) {
+    const ctx = this.ctx
+    const ts = this.tileSize * this.camera.zoom
+    const cx = canvasW / 2
+    const cy = canvasH / 2
+
+    for (const npc of npcs) {
+      const sx = (npc.x - this.camera.offsetX) * ts + cx
+      const sy = (npc.y - this.camera.offsetY) * ts + cy
+      if (sx + ts < 0 || sy + ts < 0 || sx > canvasW || sy > canvasH) continue
+
+      // Shadow
+      ctx.fillStyle = 'rgba(0,0,0,0.2)'
+      ctx.beginPath()
+      ctx.ellipse(sx + ts / 2, sy + ts * 0.9, ts * 0.3, ts * 0.08, 0, 0, Math.PI * 2)
+      ctx.fill()
+
+      // NPC emoji
+      const npcDefs: Record<string, string> = {
+        elder: '👴', merchant: '👩‍🌾', blacksmith: '🔨',
+        botanist: '🌸', fisherman: '🎣', archaeologist: '🏺', trader: '🎭',
+      }
+      ctx.font = `${Math.max(16, ts * 0.9)}px serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(npcDefs[npc.id] ?? '👤', sx + ts / 2, sy + ts * 0.45)
+
+      // Name tag
+      if (ts > 20) {
+        ctx.font = `${Math.max(8, ts * 0.25)}px monospace`
+        ctx.fillStyle = 'rgba(255,255,255,0.7)'
+        ctx.fillText(npc.id, sx + ts / 2, sy + ts * 1.05)
+      }
+    }
+  }
+
+  renderNpcPrompt(npcDef: NpcDef, canvasW: number, canvasH: number) {
+    const ctx = this.ctx
+    const text = `[E] ${npcDef.emoji} Talk to ${npcDef.name}`
+    ctx.font = 'bold 14px monospace'
+    ctx.textAlign = 'center'
+    const tw = ctx.measureText(text).width + 24
+    const px = canvasW / 2
+    const py = canvasH / 2 + 80
+
+    ctx.fillStyle = 'rgba(100,50,150,0.8)'
+    ctx.beginPath()
+    ctx.roundRect(px - tw / 2, py - 12, tw, 28, 6)
+    ctx.fill()
+    ctx.fillStyle = '#e9d5ff'
+    ctx.fillText(text, px, py + 5)
   }
 
   renderPlayer(player: Player) {

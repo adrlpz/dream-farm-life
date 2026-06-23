@@ -1,4 +1,4 @@
-// Engine.ts — Main game loop + orchestrator (Phase 2)
+// Engine.ts — Main game loop (Phase 4: +NPCs, quests, dialog)
 import { Camera } from './Camera'
 import { InputManager } from './InputManager'
 import { Renderer } from './Renderer'
@@ -6,7 +6,10 @@ import { ChunkManager } from './ChunkManager'
 import { CollisionSystem } from './CollisionSystem'
 import { ParticleSystem } from './ParticleSystem'
 import { Player } from '../entities/Player'
+import { NpcManager } from '../entities/NPC'
 import { InteractionSystem } from '../systems/InteractionSystem'
+import { GrowthSystem } from '../systems/GrowthSystem'
+import { QuestSystem } from '../systems/QuestSystem'
 import type { EngineConfig, EngineState, GameTime, BiomeType } from './types'
 
 export class Engine {
@@ -19,6 +22,9 @@ export class Engine {
   collision: CollisionSystem
   particles: ParticleSystem
   interaction: InteractionSystem
+  growth: GrowthSystem
+  quests: QuestSystem
+  npcs: NpcManager
   player: Player
 
   width: number
@@ -31,6 +37,10 @@ export class Engine {
   private rafId = 0
   private onStateChange?: (state: EngineState) => void
   private autoSaveTimer = 0
+  private growthTimer = 0
+
+  // Dialog state
+  activeDialog: { npcId: string; lineIndex: number } | null = null
 
   private static readonly TIME_SCALE = 60
 
@@ -49,6 +59,10 @@ export class Engine {
     this.particles = new ParticleSystem()
     this.player = new Player(16, 16)
     this.interaction = new InteractionSystem(this.chunks)
+    this.growth = new GrowthSystem()
+    this.quests = new QuestSystem()
+    this.npcs = new NpcManager()
+    this.npcs.initialize()
     this.renderer = new Renderer(this.ctx, this.camera, this.tileSize)
 
     this.gameTime = { day: 1, hour: 8, minute: 0, season: 'spring', year: 1 }
@@ -56,7 +70,6 @@ export class Engine {
     this.camera.setTarget(this.player.data.x, this.player.data.y)
     this.camera.snapToTarget()
 
-    // Zoom via scroll
     this.input.bindZoom((delta) => {
       this.camera.setZoom(this.camera.zoom + delta)
     })
@@ -86,18 +99,45 @@ export class Engine {
   private update(dt: number) {
     const input = this.input.getState()
 
-    // Player movement
-    this.player.processInput(input, dt)
-    this.collision.resolvePlayer(this.player)
+    // Don't process movement during dialog
+    if (!this.activeDialog) {
+      this.player.processInput(input, dt)
+      this.collision.resolvePlayer(this.player)
 
-    // Interaction (E key / space)
-    if (this.player.data.interacting) {
-      const result = this.interaction.attemptGather(this.player)
-      if (result.success) {
-        this.camera.addShake(1.5)
-        // Emit particles at facing tile
+      // Interaction (E key)
+      if (this.player.data.interacting) {
+        // Check for NPC first
         const facing = this.player.getFacingTile()
-        this.particles.emit(facing.x + 0.5, facing.y + 0.5, 8, '#ffd700', 0.8)
+        const nearbyNpc = this.npcs.getNpcAt(facing.x, facing.y, 2)
+        if (nearbyNpc) {
+          this.openDialog(nearbyNpc.id)
+        } else {
+          // Try farming/gathering
+          const result = this.interaction.attemptInteract(this.player)
+          if (result.success) {
+            this.camera.addShake(1.5)
+            const facingPos = this.player.getFacingTile()
+            const colors: Record<string, string> = {
+              gather: '#ffd700', till: '#8b6914', water: '#3b8dbd',
+              plant: '#4ade80', harvest: '#f0c040',
+            }
+            this.particles.emit(facingPos.x + 0.5, facingPos.y + 0.5, 8, colors[result.action] ?? '#ffd700', 0.8)
+
+            // Update quest progress
+            if (result.action === 'harvest') {
+              for (const item of result.items) {
+                this.quests.updateProgress('harvest', item.itemId, item.count)
+                this.quests.updateProgress('harvest', 'any', item.count)
+              }
+            }
+            if (result.action === 'gather') {
+              for (const item of result.items) {
+                this.quests.updateProgress('gather', item.itemId, item.count)
+                this.quests.updateProgress('gather', 'any', item.count)
+              }
+            }
+          }
+        }
       }
     }
 
@@ -116,10 +156,36 @@ export class Engine {
     // Animation
     this.player.updateAnimation(dt)
 
-    // Particles
+    // Growth
+    this.growthTimer += dt
+    if (this.growthTimer >= 0.5) {
+      this.growthTimer = 0
+      const cropResults = this.growth.updatePlots(this.interaction.farmPlots, 0.5, this.gameTime.season)
+      for (const r of cropResults) {
+        if (r.type === 'crop_ready') {
+          this.interaction.addNotification(`${r.emoji} Ready to harvest!`)
+          this.quests.updateProgress('harvest', r.cropId!, 0) // track discovery
+        }
+      }
+    }
+
+    // Check quest auto-completion
+    for (const aq of this.quests.activeQuests) {
+      if (this.quests.isQuestComplete(aq.questId)) {
+        const def = this.quests.completeQuest(aq.questId, this.player)
+        if (def) {
+          this.camera.addShake(3)
+          this.particles.emit(this.player.data.x, this.player.data.y, 20, '#ffd700', 1.5)
+        }
+      }
+    }
+
+    // Discover biome quests
+    const currentBiome = this.getCurrentBiome()
+    this.quests.updateProgress('discover_biome', currentBiome, 0)
+
     this.particles.update(dt)
 
-    // Auto-save
     this.autoSaveTimer += dt
     if (this.autoSaveTimer > 30) {
       this.autoSaveTimer = 0
@@ -127,6 +193,30 @@ export class Engine {
     }
 
     this.notifyState()
+  }
+
+  openDialog(npcId: string) {
+    this.activeDialog = { npcId, lineIndex: 0 }
+    this.player.data.interacting = false
+    this.player.data.interactCooldown = 0.5
+  }
+
+  closeDialog() {
+    this.activeDialog = null
+  }
+
+  // Get NPC state for UI
+  getNpcDialogState() {
+    if (!this.activeDialog) return null
+    const npcDef = this.npcs.getDef(this.activeDialog.npcId)
+    if (!npcDef) return null
+
+    const questInfo = this.quests.getNpcQuests(this.activeDialog.npcId)
+    return {
+      npc: npcDef,
+      dialog: npcDef.dialog,
+      quests: questInfo,
+    }
   }
 
   private render() {
@@ -137,19 +227,31 @@ export class Engine {
     )
 
     this.renderer.renderChunks(visibleChunks)
+    this.renderer.renderFarmPlots(this.interaction.farmPlots, this.camera, this.width, this.height)
+    this.renderer.renderNpcs(this.npcs.npcs, this.camera, this.width, this.height)
     this.renderer.renderEntities(visibleChunks, this.camera)
     this.renderer.renderPlayer(this.player)
 
-    // Render particles
     this.particles.render(
       this.ctx, this.camera.offsetX, this.camera.offsetY,
       this.camera.zoom, this.width, this.height, this.tileSize
     )
 
-    // Render interaction prompt
-    const nearby = this.interaction.getNearbyResource(this.player)
-    if (nearby) {
-      this.renderer.renderInteractionPrompt(nearby, this.player, this.width, this.height)
+    if (!this.activeDialog) {
+      const nearby = this.interaction.getNearbyResource(this.player)
+      if (nearby) {
+        this.renderer.renderInteractionPrompt(nearby, this.player, this.width, this.height)
+      }
+
+      // Check for nearby NPC
+      const facing = this.player.getFacingTile()
+      const nearNpc = this.npcs.getNpcAt(facing.x, facing.y, 2)
+      if (nearNpc) {
+        const def = this.npcs.getDef(nearNpc.id)
+        if (def) {
+          this.renderer.renderNpcPrompt(def, this.width, this.height)
+        }
+      }
     }
 
     this.renderer.renderMinimap(visibleChunks, this.player, this.width, this.height)
@@ -166,6 +268,8 @@ export class Engine {
       this.gameTime.hour = 0
       this.gameTime.day++
       this.player.data.stamina = this.player.data.maxStamina
+      this.npcs.resetDaily()
+      this.quests.refreshDailies()
     }
     while (this.gameTime.day > 28) {
       this.gameTime.day = 1
@@ -190,7 +294,17 @@ export class Engine {
       currentBiome: this.getCurrentBiome(),
       discoveredChunks: this.chunks.getDiscoveredCount(),
       nearbyResource: this.interaction.getNearbyResource(this.player),
-      notifications: this.interaction.consumeNotifications(),
+      notifications: [
+        ...this.interaction.consumeNotifications(),
+        ...this.quests.consumeNotifications(),
+      ],
+      farmPlotCount: this.interaction.farmPlots.length,
+      animalCount: this.interaction.farmAnimals.length,
+      showPlantingUI: false,
+      availableSeeds: this.interaction.getAvailableSeeds(this.player),
+      activeQuests: this.quests.activeQuests,
+      completedQuests: this.quests.completedQuests,
+      activeDialog: this.activeDialog,
     }
     this.onStateChange(state)
   }
@@ -200,10 +314,11 @@ export class Engine {
       player: this.player.data,
       gameTime: this.gameTime,
       chunks: this.chunks.serialize(),
+      farm: this.interaction.serializeFarm(),
+      quests: { active: this.quests.activeQuests, completed: this.quests.completedQuests },
+      npcs: this.npcs.serialize(),
     }
-    try {
-      localStorage.setItem('dreamfarm_openworld', JSON.stringify(data))
-    } catch {}
+    try { localStorage.setItem('dreamfarm_openworld', JSON.stringify(data)) } catch {}
   }
 
   load(): boolean {
@@ -214,10 +329,14 @@ export class Engine {
       this.player.data = { ...this.player.data, ...data.player }
       this.gameTime = data.gameTime
       this.chunks.deserialize(data.chunks)
+      if (data.farm) this.interaction.deserializeFarm(data.farm)
+      if (data.quests) {
+        this.quests.activeQuests = data.quests.active ?? []
+        this.quests.completedQuests = data.quests.completed ?? []
+      }
+      if (data.npcs) this.npcs.deserialize(data.npcs)
       this.camera.snapToTarget()
       return true
-    } catch {
-      return false
-    }
+    } catch { return false }
   }
 }

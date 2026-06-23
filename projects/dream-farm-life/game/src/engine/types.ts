@@ -82,6 +82,9 @@ export interface PlayerData {
   hotbarIndex: number
   interacting: boolean
   interactCooldown: number
+  farmingLevel: number
+  farmingXp: number
+  farmingXpToNext: number
 }
 
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'up_left' | 'up_right' | 'down_left' | 'down_right'
@@ -148,4 +151,11 @@ export interface EngineState {
   discoveredChunks: number
   nearbyResource: NearbyResource | null
   notifications: string[]
+  farmPlotCount: number
+  animalCount: number
+  showPlantingUI: boolean
+  availableSeeds: string[]
+  activeQuests: { questId: string; progress: number[]; startedAt: number }[]
+  completedQuests: string[]
+  activeDialog: { npcId: string; lineIndex: number } | null
 }
