@@ -9,6 +9,8 @@ import { DialogUI } from './DialogUI'
 import { QuestLog } from './QuestLog'
 import { CraftingUI } from './CraftingUI'
 import { SkillPanel } from './SkillPanel'
+import { WalletUI } from './WalletUI'
+import { MarketplaceUI } from './MarketplaceUI'
 import type { SkillId } from '../data/skills'
 import type { SkillState } from '../systems/SkillSystem'
 
@@ -25,6 +27,8 @@ export function GameCanvas() {
   const [showQuestLog, setShowQuestLog] = useState(false)
   const [showCrafting, setShowCrafting] = useState(false)
   const [showSkills, setShowSkills] = useState(false)
+  const [showWallet, setShowWallet] = useState(false)
+  const [showMarket, setShowMarket] = useState(false)
   const [notifications, setNotifications] = useState<string[]>([])
 
   const handleStateChange = useCallback((s: EngineState) => {
@@ -49,7 +53,9 @@ export function GameCanvas() {
       if (e.key === 'q' || e.key === 'Q') setShowQuestLog(p => !p)
       if (e.key === 'c' || e.key === 'C') setShowCrafting(p => !p)
       if (e.key === 'k' || e.key === 'K') setShowSkills(p => !p)
-      if (e.key === 'Escape') { setShowInventory(false); setShowQuestLog(false); setShowCrafting(false); setShowSkills(false); engine.closeDialog() }
+      if (e.key === 'p' || e.key === 'P') setShowWallet(p => !p)
+      if (e.key === 'm' || e.key === 'M') setShowMarket(p => !p)
+      if (e.key === 'Escape') { setShowInventory(false); setShowQuestLog(false); setShowCrafting(false); setShowSkills(false); setShowWallet(false); setShowMarket(false); engine.closeDialog() }
     }
     window.addEventListener('keydown', onKey)
     return () => { engine.stop(); engine.save(); window.removeEventListener('resize', resize); window.removeEventListener('keydown', onKey) }
@@ -119,8 +125,27 @@ export function GameCanvas() {
         />
       )}
 
+      {showWallet && engine && (
+        <WalletUI
+          wallet={engine.wallet.state}
+          onConnect={() => engine.wallet.connect()}
+          onDisconnect={() => engine.wallet.disconnect()}
+          onClose={() => setShowWallet(false)}
+        />
+      )}
+
+      {showMarket && engine && (
+        <MarketplaceUI
+          wallet={engine.wallet.state}
+          inventory={state?.player.inventory ?? []}
+          onBuy={(id) => engine.token.buyItem(id)}
+          onSell={(id) => {}}
+          onClose={() => setShowMarket(false)}
+        />
+      )}
+
       <div className="absolute bottom-20 left-4 text-white/30 text-xs select-none pointer-events-none">
-        WASD=Move · E=Gather/Talk · 1-5=Hotbar · I=Inventory · Q=Quests · C=Craft · K=Skills · Esc=Close
+        WASD=Move · E=Gather/Talk · 1-5=Hotbar · I=Inventory · Q=Quests · C=Craft · K=Skills · P=Wallet · M=Market · Esc=Close
       </div>
     </div>
   )

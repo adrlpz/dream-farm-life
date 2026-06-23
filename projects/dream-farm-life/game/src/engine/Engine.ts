@@ -14,6 +14,10 @@ import { CraftingSystem } from '../systems/CraftingSystem'
 import { BuildingPlacer } from '../systems/BuildingPlacer'
 import { WeatherSystem } from '../systems/WeatherSystem'
 import { SkillSystem } from '../systems/SkillSystem'
+import { SolanaWallet } from '../solana/wallet'
+import { DreamToken } from '../solana/token'
+import { NftManager } from '../solana/nfts'
+import { Connection } from '@solana/web3.js'
 import type { EngineConfig, EngineState, GameTime, BiomeType } from './types'
 
 export class Engine {
@@ -32,6 +36,9 @@ export class Engine {
   buildings: BuildingPlacer
   weather: WeatherSystem
   skills: SkillSystem
+  wallet: SolanaWallet
+  token: DreamToken
+  nfts: NftManager
   npcs: NpcManager
   player: Player
 
@@ -73,6 +80,9 @@ export class Engine {
     this.buildings = new BuildingPlacer()
     this.weather = new WeatherSystem()
     this.skills = new SkillSystem()
+    this.wallet = new SolanaWallet('devnet')
+    this.token = new DreamToken(this.wallet, new Connection('https://api.devnet.solana.com', 'confirmed'))
+    this.nfts = new NftManager(this.wallet)
     this.npcs = new NpcManager()
     this.npcs.initialize()
     this.renderer = new Renderer(this.ctx, this.camera, this.tileSize)
