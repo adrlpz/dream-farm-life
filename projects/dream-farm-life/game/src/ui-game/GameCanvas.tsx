@@ -88,6 +88,7 @@ export function GameCanvas() {
           buildingCount={state.buildingCount ?? 0}
           claimSize={state.claimSize ?? 9}
           weather={state.weather}
+          onlineCount={state.onlineCount ?? 1}
         />
       )}
 

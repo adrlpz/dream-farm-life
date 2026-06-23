@@ -17,6 +17,7 @@ import { SkillSystem } from '../systems/SkillSystem'
 import { SolanaWallet } from '../solana/wallet'
 import { DreamToken } from '../solana/token'
 import { NftManager } from '../solana/nfts'
+import { NetworkManager } from '../multiplayer/NetworkManager'
 import { Connection } from '@solana/web3.js'
 import type { EngineConfig, EngineState, GameTime, BiomeType } from './types'
 
@@ -39,6 +40,7 @@ export class Engine {
   wallet: SolanaWallet
   token: DreamToken
   nfts: NftManager
+  network: NetworkManager
   npcs: NpcManager
   player: Player
 
@@ -54,6 +56,7 @@ export class Engine {
   private autoSaveTimer = 0
   private growthTimer = 0
   private weatherParticleTimer = 0
+  private networkTimer = 0
 
   activeDialog: { npcId: string; lineIndex: number } | null = null
 
@@ -83,6 +86,11 @@ export class Engine {
     this.wallet = new SolanaWallet('devnet')
     this.token = new DreamToken(this.wallet, new Connection('https://api.devnet.solana.com', 'confirmed'))
     this.nfts = new NftManager(this.wallet)
+    this.network = new NetworkManager(
+      'wss://dreamfarm-ws.adrlpz.site',
+      crypto.randomUUID(),
+      'Farmer'
+    )
     this.npcs = new NpcManager()
     this.npcs.initialize()
     this.renderer = new Renderer(this.ctx, this.camera, this.tileSize)
@@ -97,10 +105,11 @@ export class Engine {
     if (this.running) return
     this.running = true
     this.lastTime = performance.now()
+    this.network.connect()
     this.rafId = requestAnimationFrame(this.loop)
   }
 
-  stop() { this.running = false; cancelAnimationFrame(this.rafId) }
+  stop() { this.running = false; cancelAnimationFrame(this.rafId); this.network.disconnect() }
 
   private loop = (now: number) => {
     if (!this.running) return
@@ -239,6 +248,19 @@ export class Engine {
     }
 
     this.particles.update(dt)
+
+    // Network sync
+    this.network.update(dt)
+    this.networkTimer += dt
+    if (this.networkTimer >= 0.05) { // 20Hz
+      this.networkTimer = 0
+      this.network.sendMove(
+        this.player.data.x, this.player.data.y,
+        this.player.data.direction, this.getCurrentBiome(),
+        this.player.data.isRunning, this.player.data.animFrame
+      )
+    }
+
     this.autoSaveTimer += dt
     if (this.autoSaveTimer > 30) { this.autoSaveTimer = 0; this.save() }
     this.notifyState()
@@ -271,6 +293,11 @@ export class Engine {
     this.renderer.renderNpcs(this.npcs.npcs, this.camera, this.width, this.height)
     this.renderer.renderEntities(visibleChunks, this.camera)
     this.renderer.renderPlayer(this.player)
+
+    // Render remote players
+    for (const [id, remote] of this.network.remotePlayers) {
+      this.renderer.renderRemotePlayer(remote, this.camera, this.width, this.height)
+    }
 
     this.particles.render(this.ctx, this.camera.offsetX, this.camera.offsetY, this.camera.zoom, this.width, this.height, this.tileSize)
 
@@ -342,6 +369,7 @@ export class Engine {
         ...this.crafting.consumeNotifications(),
         ...this.buildings.consumeNotifications(),
         ...this.skills.consumeNotifications(),
+        ...this.network.consumeNotifications(),
       ],
       farmPlotCount: this.interaction.farmPlots.length,
       animalCount: this.interaction.farmAnimals.length,
@@ -355,6 +383,7 @@ export class Engine {
       craftingQueueCount: this.crafting.queue.length,
       weather: { type: this.weather.state.current, emoji: this.weather.emoji, name: this.weather.name },
       skills: this.skills.serialize(),
+      onlineCount: this.network.onlineCount,
     })
   }
 

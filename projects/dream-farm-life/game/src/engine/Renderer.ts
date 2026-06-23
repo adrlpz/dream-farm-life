@@ -358,6 +358,95 @@ export class Renderer {
     }
   }
 
+  renderRemotePlayer(remote: any, camera: Camera, canvasW: number, canvasH: number) {
+    const ctx = this.ctx
+    const ts = this.tileSize * camera.zoom
+    const cx = canvasW / 2
+    const cy = canvasH / 2
+    const sx = (remote.x - camera.offsetX) * ts + cx
+    const sy = (remote.y - camera.offsetY) * ts + cy
+
+    // Skip if off screen
+    if (sx < -ts || sx > canvasW + ts || sy < -ts || sy > canvasH + ts) return
+
+    // Skin colors
+    const SKIN_COLORS = ['#4a90d9', '#d94a4a', '#4ad94a', '#d9d94a', '#9a4ad9', '#d98a4a', '#4ad9d9', '#d94a9a']
+    const bodyColor = SKIN_COLORS[remote.skin % 8] ?? '#4a90d9'
+
+    // Shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.2)'
+    ctx.beginPath()
+    ctx.ellipse(sx + ts / 2, sy + ts * 0.85, ts * 0.25, ts * 0.06, 0, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Body
+    ctx.fillStyle = bodyColor
+    ctx.beginPath()
+    ctx.arc(sx + ts / 2, sy + ts / 2, ts * 0.3, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Face
+    ctx.fillStyle = '#f5d0a9'
+    ctx.beginPath()
+    ctx.arc(sx + ts / 2, sy + ts * 0.4, ts * 0.18, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Eyes
+    ctx.fillStyle = '#333'
+    const eyeOff = ts * 0.06
+    let ex1 = -eyeOff, ex2 = eyeOff, ey = 2
+    switch (remote.direction) {
+      case 'up': ey = -3; break
+      case 'left': ex1 = -eyeOff * 1.5; ex2 = -eyeOff * 0.3; break
+      case 'right': ex1 = eyeOff * 0.3; ex2 = eyeOff * 1.5; break
+    }
+    ctx.beginPath()
+    ctx.arc(sx + ts / 2 + ex1, sy + ts * 0.38 + ey, ts * 0.03, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(sx + ts / 2 + ex2, sy + ts * 0.38 + ey, ts * 0.03, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Name tag
+    ctx.font = `${Math.max(10, ts * 0.28)}px sans-serif`
+    ctx.textAlign = 'center'
+    ctx.fillStyle = 'rgba(0,0,0,0.6)'
+    const nameW = ctx.measureText(remote.name).width + 8
+    ctx.fillRect(sx + ts / 2 - nameW / 2, sy - ts * 0.35, nameW, ts * 0.25)
+    ctx.fillStyle = '#fff'
+    ctx.fillText(remote.name, sx + ts / 2, sy - ts * 0.2)
+
+    // Emote bubble
+    if (remote.emote) {
+      ctx.font = `${Math.max(12, ts * 0.5)}px serif`
+      ctx.fillText(remote.emote, sx + ts / 2, sy - ts * 0.6)
+    }
+
+    // Chat bubble
+    if (remote.chatMessage) {
+      ctx.font = `${Math.max(10, ts * 0.25)}px sans-serif`
+      const msg = remote.chatMessage.slice(0, 30)
+      const msgW = ctx.measureText(msg).width + 10
+      ctx.fillStyle = 'rgba(0,0,0,0.7)'
+      ctx.beginPath()
+      ctx.roundRect(sx + ts / 2 - msgW / 2, sy - ts * 0.9, msgW, ts * 0.3, 4)
+      ctx.fill()
+      ctx.fillStyle = '#fff'
+      ctx.fillText(msg, sx + ts / 2, sy - ts * 0.72)
+    }
+
+    // Running trail
+    if (remote.isRunning) {
+      ctx.strokeStyle = `${bodyColor}44`
+      ctx.lineWidth = 2
+      ctx.setLineDash([3, 3])
+      ctx.beginPath()
+      ctx.arc(sx + ts / 2, sy + ts / 2, ts * 0.4, 0, Math.PI * 2)
+      ctx.stroke()
+      ctx.setLineDash([])
+    }
+  }
+
   renderInteractionPrompt(nearby: NearbyResource, player: Player, canvasW: number, canvasH: number) {
     const ctx = this.ctx
     const hasTool = nearby.toolNeeded ? player.data.equippedTool && TOOL_DEFS[player.data.equippedTool]?.type === nearby.toolNeeded : true

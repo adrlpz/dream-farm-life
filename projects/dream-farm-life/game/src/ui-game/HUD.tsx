@@ -21,12 +21,13 @@ interface HUDProps {
   buildingCount: number
   claimSize: number
   weather?: { type: string; emoji: string; name: string }
+  onlineCount?: number
 }
 
 export function HUD({
   stamina, maxStamina, biome, day, hour, minute, season, year,
   discoveredChunks, equippedTool, inventoryCount,
-  farmingLevel, farmingXp, farmingXpToNext, farmPlotCount, activeQuestCount, buildingCount, claimSize, weather,
+  farmingLevel, farmingXp, farmingXpToNext, farmPlotCount, activeQuestCount, buildingCount, claimSize, weather, onlineCount,
 }: HUDProps) {
   const staminaPct = (stamina / maxStamina) * 100
   const farmXpPct = (farmingXp / farmingXpToNext) * 100
@@ -87,7 +88,7 @@ export function HUD({
 
         {/* Stats */}
         <div className="bg-black/60 backdrop-blur-sm rounded-lg px-3 py-1.5 text-white/70 text-xs">
-          🎒 {inventoryCount}/30 · 🌾 {farmPlotCount} plots · 📜 {activeQuestCount} · 🏗️ {buildingCount} · 🗺️ {claimSize}x{claimSize}
+          🎒 {inventoryCount}/30 · 🌾 {farmPlotCount} plots · 📜 {activeQuestCount} · 🏗️ {buildingCount} · 🗺️ {claimSize}x{claimSize} · 👥 {onlineCount ?? 1}
         </div>
       </div>
     </>
