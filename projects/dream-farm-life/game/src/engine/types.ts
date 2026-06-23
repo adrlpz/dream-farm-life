@@ -158,4 +158,7 @@ export interface EngineState {
   activeQuests: { questId: string; progress: number[]; startedAt: number }[]
   completedQuests: string[]
   activeDialog: { npcId: string; lineIndex: number } | null
+  buildingCount: number
+  claimSize: number
+  craftingQueueCount: number
 }

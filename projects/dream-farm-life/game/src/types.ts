@@ -99,7 +99,7 @@ export interface ProductDef {
 export type BuildingId = 'barn' | 'silo' | 'coop' | 'cowshed' | 'market' | 'well' | 'windmill'
 
 export interface BuildingDef {
-  id: BuildingId
+  id: string
   name: string
   emoji: string
   description: string
@@ -108,6 +108,16 @@ export interface BuildingDef {
   costMultiplier: number
   effect: string
 }
+
+import { BUILDINGS as _BUILDINGS, getBuildingCost } from './data/buildings'
+export { getBuildingCost }
+
+export const BUILDINGS_COMPAT: Record<string, BuildingDef> = Object.fromEntries(
+  Object.entries(_BUILDINGS).map(([id, b]) => [id, {
+    id: b.id, name: b.name, emoji: b.emoji, description: b.description,
+    maxLevel: b.maxTier, baseCost: 100, costMultiplier: 2, effect: b.tiers[0]?.effect ?? '',
+  }])
+)
 
 export interface PlacedBuilding {
   buildingId: BuildingId

@@ -5,7 +5,7 @@ import { TILE_DEFS } from '../data/tiles'
 import { ITEMS } from '../data/items'
 import { TOOL_DEFS } from '../data/tools'
 import type { Chunk, TileType, BiomeType, NearbyResource } from './types'
-import type { FarmPlot } from '../systems/farmTypes'
+import type { FarmPlot, PlacedBuildingState } from '../systems/farmTypes'
 import type { NpcState } from '../entities/NPC'
 import type { NpcDef } from '../data/npcs'
 import { CROPS } from '../data/crops'
@@ -151,6 +151,83 @@ export class Renderer {
         }
       }
     }
+  }
+
+  renderBuildings(buildings: PlacedBuildingState[], camera: Camera, canvasW: number, canvasH: number) {
+    const ctx = this.ctx
+    const ts = this.tileSize * this.camera.zoom
+    const cx = canvasW / 2
+    const cy = canvasH / 2
+
+    const buildingEmojis: Record<string, string> = {
+      barn: '🏚️', animal_pen: '🏠', greenhouse: '🌿', well: '🪣',
+      windmill: '🏗️', market_stall: '🏪', farmhouse: '🏡',
+    }
+
+    for (const b of buildings) {
+      const sx = (b.x - this.camera.offsetX) * ts + cx
+      const sy = (b.y - this.camera.offsetY) * ts + cy
+      const bw = b.width * ts
+      const bh = b.height * ts
+      if (sx + bw < 0 || sy + bh < 0 || sx > canvasW || sy > canvasH) continue
+
+      // Foundation
+      ctx.fillStyle = 'rgba(100,80,60,0.4)'
+      ctx.fillRect(sx, sy, bw, bh)
+
+      // Border
+      ctx.strokeStyle = 'rgba(200,180,140,0.6)'
+      ctx.lineWidth = 1
+      ctx.strokeRect(sx, sy, bw, bh)
+
+      // Emoji
+      const emoji = buildingEmojis[b.buildingId] ?? '🏗️'
+      ctx.font = `${Math.max(20, ts * 1.2)}px serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(emoji, sx + bw / 2, sy + bh / 2)
+
+      // Tier badge
+      if (b.tier > 1) {
+        ctx.font = `${Math.max(8, ts * 0.3)}px monospace`
+        ctx.fillStyle = '#ffd700'
+        ctx.fillText(`T${b.tier}`, sx + bw - ts * 0.3, sy + ts * 0.3)
+      }
+    }
+  }
+
+  renderLandClaim(claim: { x: number; y: number; size: number }, camera: Camera, canvasW: number, canvasH: number) {
+    const ctx = this.ctx
+    const ts = this.tileSize * this.camera.zoom
+    const cx = canvasW / 2
+    const cy = canvasH / 2
+
+    const sx = (claim.x - this.camera.offsetX) * ts + cx
+    const sy = (claim.y - this.camera.offsetY) * ts + cy
+    const size = claim.size * ts
+
+    // Dashed border
+    ctx.strokeStyle = 'rgba(74,222,128,0.3)'
+    ctx.lineWidth = 2
+    ctx.setLineDash([6, 4])
+    ctx.strokeRect(sx, sy, size, size)
+    ctx.setLineDash([])
+  }
+
+  renderBuildingPrompt(building: PlacedBuildingState, canvasW: number, canvasH: number) {
+    const ctx = this.ctx
+    const text = `[E] 🏗️ ${building.buildingId} (T${building.tier})`
+    ctx.font = 'bold 14px monospace'
+    ctx.textAlign = 'center'
+    const tw = ctx.measureText(text).width + 24
+    const px = canvasW / 2
+    const py = canvasH / 2 + 100
+    ctx.fillStyle = 'rgba(100,80,50,0.8)'
+    ctx.beginPath()
+    ctx.roundRect(px - tw / 2, py - 12, tw, 28, 6)
+    ctx.fill()
+    ctx.fillStyle = '#fbbf24'
+    ctx.fillText(text, px, py + 5)
   }
 
   renderNpcs(npcs: NpcState[], camera: Camera, canvasW: number, canvasH: number) {
