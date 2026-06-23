@@ -1,9 +1,10 @@
-// GameCanvas.tsx — Main game canvas component (React wrapper)
+// GameCanvas.tsx — Main game canvas component (Phase 2)
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Engine } from '../engine/Engine'
 import type { EngineState, BiomeType } from '../engine/types'
 import { HUD } from './HUD'
-import { TouchControls } from './TouchControls'
+import { InventoryPanel } from './InventoryPanel'
+import { NotificationStack } from './NotificationStack'
 
 const BIOME_NAMES: Record<BiomeType, string> = {
   farmland: '🌾 Farmland',
@@ -20,15 +21,18 @@ export function GameCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
   const [state, setState] = useState<EngineState | null>(null)
-  const [showControls, setShowControls] = useState(false)
-
-  // Detect mobile
-  useEffect(() => {
-    setShowControls('ontouchstart' in window || navigator.maxTouchPoints > 0)
-  }, [])
+  const [showInventory, setShowInventory] = useState(false)
+  const [notifications, setNotifications] = useState<string[]>([])
 
   const handleStateChange = useCallback((s: EngineState) => {
     setState(s)
+    if (s.notifications.length > 0) {
+      setNotifications(prev => [...prev, ...s.notifications].slice(-6))
+      // Auto-remove after 3s
+      setTimeout(() => {
+        setNotifications(prev => prev.slice(s.notifications.length))
+      }, 3000)
+    }
   }, [])
 
   useEffect(() => {
@@ -50,26 +54,27 @@ export function GameCanvas() {
       onStateChange: handleStateChange,
     })
 
-    // Bind zoom
-    engine.input.bindZoom((delta) => {
-      engine.camera.setZoom(engine.camera.zoom + delta)
-    })
-
-    // Try to load saved game
     engine.load()
-
-    // Auto-save every 30s
-    const saveInterval = setInterval(() => engine.save(), 30000)
-    window.addEventListener('beforeunload', () => engine.save())
-
     engine.start()
     engineRef.current = engine
+
+    // Keyboard shortcuts
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'i' || e.key === 'I' || e.key === 'Tab') {
+        e.preventDefault()
+        setShowInventory(prev => !prev)
+      }
+      if (e.key === 'Escape') {
+        setShowInventory(false)
+      }
+    }
+    window.addEventListener('keydown', onKey)
 
     return () => {
       engine.stop()
       engine.save()
-      clearInterval(saveInterval)
       window.removeEventListener('resize', resize)
+      window.removeEventListener('keydown', onKey)
     }
   }, [handleStateChange])
 
@@ -81,7 +86,7 @@ export function GameCanvas() {
         style={{ touchAction: 'none' }}
       />
 
-      {/* HUD Overlay */}
+      {/* HUD */}
       {state && (
         <HUD
           stamina={state.player.stamina}
@@ -93,26 +98,26 @@ export function GameCanvas() {
           season={state.gameTime.season}
           year={state.gameTime.year}
           discoveredChunks={state.discoveredChunks}
+          equippedTool={state.player.equippedTool}
+          inventoryCount={state.player.inventory.length}
         />
       )}
 
-      {/* Mobile Touch Controls */}
-      {showControls && (
-        <TouchControls
-          onMove={(dx, dy) => {
-            const engine = engineRef.current
-            if (!engine) return
-            engine.input // joystick handled via InputManager touch events
-          }}
+      {/* Notifications */}
+      <NotificationStack notifications={notifications} />
+
+      {/* Inventory overlay */}
+      {showInventory && state && (
+        <InventoryPanel
+          inventory={state.player.inventory}
+          onClose={() => setShowInventory(false)}
         />
       )}
 
-      {/* Controls hint (desktop) */}
-      {!showControls && (
-        <div className="absolute bottom-4 left-4 text-white/40 text-xs select-none pointer-events-none">
-          WASD / Arrows = Move · Shift = Run · Scroll = Zoom
-        </div>
-      )}
+      {/* Controls hint */}
+      <div className="absolute bottom-20 left-4 text-white/30 text-xs select-none pointer-events-none">
+        WASD=Move · Shift=Run · E=Gather · 1-5=Hotbar · I=Inventory · Scroll=Zoom
+      </div>
     </div>
   )
 }

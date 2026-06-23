@@ -1,10 +1,12 @@
-// Engine.ts — Main game loop + orchestrator
+// Engine.ts — Main game loop + orchestrator (Phase 2)
 import { Camera } from './Camera'
 import { InputManager } from './InputManager'
 import { Renderer } from './Renderer'
 import { ChunkManager } from './ChunkManager'
 import { CollisionSystem } from './CollisionSystem'
+import { ParticleSystem } from './ParticleSystem'
 import { Player } from '../entities/Player'
+import { InteractionSystem } from '../systems/InteractionSystem'
 import type { EngineConfig, EngineState, GameTime, BiomeType } from './types'
 
 export class Engine {
@@ -15,6 +17,8 @@ export class Engine {
   renderer: Renderer
   chunks: ChunkManager
   collision: CollisionSystem
+  particles: ParticleSystem
+  interaction: InteractionSystem
   player: Player
 
   width: number
@@ -26,8 +30,8 @@ export class Engine {
   private running = false
   private rafId = 0
   private onStateChange?: (state: EngineState) => void
+  private autoSaveTimer = 0
 
-  // Game time: 1 real second = 1 game minute
   private static readonly TIME_SCALE = 60
 
   constructor(config: EngineConfig) {
@@ -42,14 +46,20 @@ export class Engine {
     this.input = new InputManager(this.canvas)
     this.chunks = new ChunkManager()
     this.collision = new CollisionSystem(this.chunks)
-    this.player = new Player(16, 16) // spawn at center of home chunk
+    this.particles = new ParticleSystem()
+    this.player = new Player(16, 16)
+    this.interaction = new InteractionSystem(this.chunks)
     this.renderer = new Renderer(this.ctx, this.camera, this.tileSize)
 
     this.gameTime = { day: 1, hour: 8, minute: 0, season: 'spring', year: 1 }
 
-    // Camera follows player
     this.camera.setTarget(this.player.data.x, this.player.data.y)
     this.camera.snapToTarget()
+
+    // Zoom via scroll
+    this.input.bindZoom((delta) => {
+      this.camera.setZoom(this.camera.zoom + delta)
+    })
   }
 
   start() {
@@ -66,62 +76,84 @@ export class Engine {
 
   private loop = (now: number) => {
     if (!this.running) return
-    const dt = Math.min((now - this.lastTime) / 1000, 0.1) // cap delta
+    const dt = Math.min((now - this.lastTime) / 1000, 0.1)
     this.lastTime = now
-
     this.update(dt)
     this.render()
-
     this.rafId = requestAnimationFrame(this.loop)
   }
 
   private update(dt: number) {
-    // 1. Process input → player movement
     const input = this.input.getState()
-    this.player.processInput(input, dt)
 
-    // 2. Collision resolution
+    // Player movement
+    this.player.processInput(input, dt)
     this.collision.resolvePlayer(this.player)
 
-    // 3. Update chunks around player
+    // Interaction (E key / space)
+    if (this.player.data.interacting) {
+      const result = this.interaction.attemptGather(this.player)
+      if (result.success) {
+        this.camera.addShake(1.5)
+        // Emit particles at facing tile
+        const facing = this.player.getFacingTile()
+        this.particles.emit(facing.x + 0.5, facing.y + 0.5, 8, '#ffd700', 0.8)
+      }
+    }
+
+    // Update chunks
     const pcx = Math.floor(this.player.data.x / 32)
     const pcy = Math.floor(this.player.data.y / 32)
     this.chunks.updateAround(pcx, pcy)
-    this.chunks.updateAround(pcx, pcy)
 
-    // 4. Camera follow
+    // Camera
     this.camera.setTarget(this.player.data.x, this.player.data.y)
     this.camera.update(dt)
 
-    // 5. Game time
+    // Game time
     this.updateGameTime(dt)
 
-    // 6. Player animation
+    // Animation
     this.player.updateAnimation(dt)
 
-    // 7. Notify state change (throttled)
+    // Particles
+    this.particles.update(dt)
+
+    // Auto-save
+    this.autoSaveTimer += dt
+    if (this.autoSaveTimer > 30) {
+      this.autoSaveTimer = 0
+      this.save()
+    }
+
     this.notifyState()
   }
 
   private render() {
     this.renderer.clear()
 
-    // Get visible chunks
     const visibleChunks = this.chunks.getVisibleChunks(
       this.camera.offsetX, this.camera.offsetY, this.width, this.height
     )
 
-    // Render tilemap
     this.renderer.renderChunks(visibleChunks)
-
-    // Render entities (resources, objects)
     this.renderer.renderEntities(visibleChunks, this.camera)
-
-    // Render player
     this.renderer.renderPlayer(this.player)
 
-    // Render HUD elements on canvas (minimap etc)
+    // Render particles
+    this.particles.render(
+      this.ctx, this.camera.offsetX, this.camera.offsetY,
+      this.camera.zoom, this.width, this.height, this.tileSize
+    )
+
+    // Render interaction prompt
+    const nearby = this.interaction.getNearbyResource(this.player)
+    if (nearby) {
+      this.renderer.renderInteractionPrompt(nearby, this.player, this.width, this.height)
+    }
+
     this.renderer.renderMinimap(visibleChunks, this.player, this.width, this.height)
+    this.renderer.renderHotbar(this.player, this.width, this.height)
   }
 
   private updateGameTime(dt: number) {
@@ -131,9 +163,9 @@ export class Engine {
       this.gameTime.hour++
     }
     while (this.gameTime.hour >= 24) {
-      this.gameTime.hour -= 0
+      this.gameTime.hour = 0
       this.gameTime.day++
-      this.player.data.stamina = this.player.data.maxStamina // restore stamina daily
+      this.player.data.stamina = this.player.data.maxStamina
     }
     while (this.gameTime.day > 28) {
       this.gameTime.day = 1
@@ -147,8 +179,7 @@ export class Engine {
   getCurrentBiome(): BiomeType {
     const cx = Math.floor(this.player.data.x / 32)
     const cy = Math.floor(this.player.data.y / 32)
-    const chunk = this.chunks.getChunk(cx, cy)
-    return chunk?.biome ?? 'farmland'
+    return this.chunks.getChunk(cx, cy)?.biome ?? 'farmland'
   }
 
   private notifyState() {
@@ -158,26 +189,29 @@ export class Engine {
       gameTime: { ...this.gameTime },
       currentBiome: this.getCurrentBiome(),
       discoveredChunks: this.chunks.getDiscoveredCount(),
+      nearbyResource: this.interaction.getNearbyResource(this.player),
+      notifications: this.interaction.consumeNotifications(),
     }
     this.onStateChange(state)
   }
 
-  // Save/Load
   save() {
     const data = {
       player: this.player.data,
       gameTime: this.gameTime,
       chunks: this.chunks.serialize(),
     }
-    localStorage.setItem('dreamfarm_save', JSON.stringify(data))
+    try {
+      localStorage.setItem('dreamfarm_openworld', JSON.stringify(data))
+    } catch {}
   }
 
   load(): boolean {
-    const raw = localStorage.getItem('dreamfarm_save')
+    const raw = localStorage.getItem('dreamfarm_openworld')
     if (!raw) return false
     try {
       const data = JSON.parse(raw)
-      this.player.data = data.player
+      this.player.data = { ...this.player.data, ...data.player }
       this.gameTime = data.gameTime
       this.chunks.deserialize(data.chunks)
       this.camera.snapToTarget()

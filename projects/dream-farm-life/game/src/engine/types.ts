@@ -26,7 +26,7 @@ export interface BiomeDef {
   emoji: string
   primaryTiles: TileType[]
   secondaryTiles: TileType[]
-  resourceDensity: number // 0-1
+  resourceDensity: number
   color: string
 }
 
@@ -57,6 +57,12 @@ export interface EntityData {
   meta?: Record<string, unknown>
 }
 
+// Inventory
+export interface InventorySlot {
+  itemId: string
+  count: number
+}
+
 // Player
 export interface PlayerData {
   x: number
@@ -70,6 +76,12 @@ export interface PlayerData {
   isRunning: boolean
   animFrame: number
   animTimer: number
+  inventory: InventorySlot[]
+  equippedTool: string | null
+  hotbar: (string | null)[]
+  hotbarIndex: number
+  interacting: boolean
+  interactCooldown: number
 }
 
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'up_left' | 'up_right' | 'down_left' | 'down_right'
@@ -95,35 +107,29 @@ export interface InputState {
 // Game Time
 export interface GameTime {
   day: number
-  hour: number   // 0-23
-  minute: number // 0-59
+  hour: number
+  minute: number
   season: 'spring' | 'summer' | 'fall' | 'winter'
   year: number
 }
 
-// Inventory item
-export interface ItemDef {
-  id: string
-  name: string
-  emoji: string
-  category: 'seed' | 'crop' | 'resource' | 'tool' | 'fish' | 'food' | 'quest' | 'special'
-  stackable: boolean
-  maxStack: number
-  sellPrice: number
-  description: string
-}
-
-// Resource node
-export interface ResourceNodeData {
+// Resource node (chunk-based)
+export interface ResourceNodeState {
   id: string
   tileType: TileType
   x: number
   y: number
   hp: number
   maxHp: number
-  respawnTimeMs: number
   depletedAt: number | null
-  drops: { itemId: string; min: number; max: number; chance: number }[]
+}
+
+// Nearby resource info for HUD
+export interface NearbyResource {
+  tileType: TileType
+  toolNeeded: string | null
+  emoji: string
+  distance: number
 }
 
 // Engine config
@@ -140,4 +146,6 @@ export interface EngineState {
   gameTime: GameTime
   currentBiome: BiomeType
   discoveredChunks: number
+  nearbyResource: NearbyResource | null
+  notifications: string[]
 }
