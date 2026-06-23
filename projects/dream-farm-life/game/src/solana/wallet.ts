@@ -2,11 +2,11 @@
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 
 // $DREAM token mint (deployed separately)
-export const DREAM_TOKEN_MINT = new PublicKey('DREAM1111111111111111111111111111111111111111')
+export const DREAM_TOKEN_MINT = new PublicKey('11111111111111111111111111111111')
 
 // Program IDs (deployed programs)
-export const FARM_PROGRAM_ID = new PublicKey('FARM2222222222222222222222222222222222222222')
-export const NFT_PROGRAM_ID = new PublicKey('NFT333333333333333333333333333333333333333333')
+export const FARM_PROGRAM_ID = new PublicKey('11111111111111111111111111111111')
+export const NFT_PROGRAM_ID = new PublicKey('11111111111111111111111111111111')
 
 export interface WalletState {
   connected: boolean
