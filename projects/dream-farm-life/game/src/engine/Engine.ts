@@ -87,7 +87,7 @@ export class Engine {
     this.token = new DreamToken(this.wallet, new Connection('https://api.devnet.solana.com', 'confirmed'))
     this.nfts = new NftManager(this.wallet)
     this.network = new NetworkManager(
-      'wss://dreamfarm-ws.adrlpz.site',
+      `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`,
       crypto.randomUUID(),
       'Farmer'
     )
